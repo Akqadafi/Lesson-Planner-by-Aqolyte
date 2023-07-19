@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generated Lesson Plan</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="p-3">
+    <h1 class="text-center mb-4">Generated Lesson Plan</h1>
+    {% for section_title, section_text in unit_plan.items() %}
+        <div class="mb-5">
+            <h2 class="mb-3">{{ section_title }}</h2>
+            <p>{{ section_text }}</p>
+        </div>
+        {% if not loop.last %}
+            <hr>
+        {% endif %}
+    {% endfor %}
+</body>
+</html>
+
+
+
