@@ -3,6 +3,10 @@ import lesson_planner
 
 app = Flask(__name__)
 
+@app.route('/favicon.ico')
+def favicon():
+    return ('', 204)
+
 @app.route('/')
 def landing():
     return render_template('landing.html')
