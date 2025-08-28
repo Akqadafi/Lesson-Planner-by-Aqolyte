@@ -1,0 +1,39 @@
+{% extends 'landing.html' %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="text-center">
+        <h2>Select a Lesson Plan Style</h2>
+        <form id="prompt-form" method="POST" class="mt-4">
+            <input type="hidden" id="prompt" name="prompt" value="">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('prompt0')">
+                    Webquest
+                </label>
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('prompt1')">
+                    Basic Lesson Plan
+                </label>
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('prompt2')">
+                    Concept Building Lesson Plan
+                </label>
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('prompt3')">
+                    Skill Development Lesson Plan
+                </label>
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('prompt4')">
+                    Reading Lesson Plan
+                </label>
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('prompt5')">
+                    Exploration Lesson Plan
+                </label>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function submitForm(promptValue) {
+    document.getElementById('prompt').value = promptValue;
+    document.getElementById('prompt-form').submit();
+}
+</script>
+{% endblock %}

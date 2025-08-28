@@ -1,0 +1,27 @@
+{% extends 'landing.html' %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="text-center">
+        <h2>Select what you want to create:</h2>
+        <form id="choice-form" action="/redirect_choice" method="post" class="mt-4">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('lesson')">
+                    <input type="radio" name="choice" value="lesson" required> Lesson Plan
+                </label>
+                <label class="btn btn-secondary btn-lg mx-2 animated-button" onclick="submitForm('worksheet')">
+                    <input type="radio" name="choice" value="worksheet" required> Worksheet
+                </label>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function submitForm(choice) {
+    const form = document.getElementById('choice-form');
+    form.choice.value = choice;
+    form.submit();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqolyte - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Aqolyte Logo" style="width:150px;height:150px;">
+        <h1>Welcome to Aqolyte</h1>
+        <p>Empowering Education Through Innovation</p>
+    </header>
+    <section>
+        <h2>About Us</h2>
+        <p>Aqolyte is dedicated to creating innovative applications that enhance educational experiences. Our mission is to empower educators and students with tools that foster learning and creativity.</p>
+    </section>
+    <section>
+        <h2>Our Products</h2>
+        <p>Explore our range of educational applications designed to make learning engaging and effective.</p>
+        <button onclick="window.location.href='{{ url_for('products') }}'">View Products</button>
+    </section>
+    <footer>
+        <p>Contact us: info@aqolyte.com | Follow us on social media</p>
+    </footer>
+</body>
+</html>

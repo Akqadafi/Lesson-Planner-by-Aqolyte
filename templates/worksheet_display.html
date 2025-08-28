@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Worksheet</h1>
+        <h2>Worksheet Content</h2>
+        <pre>{{ content }}</pre>
+        <!-- Form to download the worksheet as a Word document -->
+        <form method="post" action="{{ url_for('output') }}">
+            <input type="hidden" name="download_word" value="true">
+            <button type="submit">Download as Word Document</button>
+        </form>
+        <!-- Button to return home -->
+        <a href="{{ url_for('landing') }}" class="btn btn-primary mt-3">Return Home</a>
+    </div>
+</body>
+</html>

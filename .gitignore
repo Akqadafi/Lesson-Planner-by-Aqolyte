@@ -1,0 +1,73 @@
+# --- Python bytecode / cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+.conda/
+pip-wheel-metadata/
+
+# --- Builds / packages ---
+build/
+dist/
+*.egg-info/
+.eggs/
+wheelhouse/
+*.whl
+
+# --- Logs / runtime / local state ---
+*.log
+logs/
+instance/            # Flask instance folder (good place for local config)
+*.pid
+*.sqlite
+*.sqlite3
+db.sqlite3
+tmp/
+.cache/
+
+# --- Testing / coverage ---
+.pytest_cache/
+.coverage*
+htmlcov/
+.tox/
+.nox/
+
+# --- Type/lint caches ---
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# --- Editors / OS cruft ---
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Node (if you bundle front-end assets) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Environment files (keep an example, never real secrets) ---
+.env
+.env.*
+!.env.example
+
+# --- Optional app data (uncomment if your app writes these) ---
+# uploads/
+# data/
+# media/

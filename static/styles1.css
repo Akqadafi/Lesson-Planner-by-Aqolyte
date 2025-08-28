@@ -1,0 +1,121 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Open+Sans&display=swap');
+
+/* Base styles */
+body {
+    font-family: 'Open Sans', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #E3F2FD, #BBDEFB);
+    animation: fadeIn 1.5s;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Header styles */
+.header {
+    background-color: #1E88E5;
+    color: #ffffff;
+    padding: 40px 0;
+    text-align: center;
+}
+.header h1 {
+    font-size: 40px;
+    font-weight: bold;
+    font-family: 'Lato', sans-serif;
+    margin-bottom: 10px;
+}
+.header p {
+    font-size: 20px;
+}
+
+/* Content styles */
+.content {
+    width: 80%;
+    margin: 60px auto;
+    text-align: center;
+}
+.description {
+    font-size: 28px;
+    margin: 30px 0;
+    color: #333;
+    font-style: italic;
+}
+
+/* Button styles */
+.start-button {
+    background-color: #FF5722;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 10px 2px;
+    cursor: pointer;
+    transition: transform .2s, background-color .3s;
+    border-radius: 10px;
+}
+.start-button:hover {
+    transform: scale(1.05);
+    background-color: #E64A19;
+}
+/* New Color Palette */
+:root {
+    --primary-blue: #1E88E5;
+    --light-blue: #E3F2FD;
+    --dark-blue: #0D47A1;
+    --accent-orange: #FF5722;
+    --accent-green: #4CAF50;
+    --light-gray: #F5F5F5;
+}
+
+/* Floating Boxes for Choices */
+.choice-box {
+    display: inline-block;
+    padding: 20px 40px;
+    margin: 10px;
+    background-color: var(--light-blue);
+    border: 1px solid var(--primary-blue);
+    border-radius: 10px;
+    transition: all 0.3s;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.choice-box:hover {
+    background-color: var(--primary-blue);
+    color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Styling for the Form in prompt0_form.html */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.form-input {
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid var(--dark-blue);
+    font-size: 16px;
+}
+
+/* Adding transitions for smoother effects */
+.start-button, .choice-box {
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}

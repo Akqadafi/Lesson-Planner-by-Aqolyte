@@ -1,22 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Generated Lesson Plan</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ unit_plan['Title'] if unit_plan.get('Title') else 'Lesson Plan' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body class="p-3">
-    <h1 class="text-center mb-4">Generated Lesson Plan</h1>
-    {% for section_title, section_text in unit_plan.items() %}
-        <div class="mb-5">
-            <h2 class="mb-3">{{ section_title }}</h2>
-            <p>{{ section_text }}</p>
-        </div>
-        {% if not loop.last %}
-            <hr>
+<body>
+    <div class="container">
+        <h1>{{ unit_plan['Title'] if unit_plan.get('Title') else 'Lesson Plan' }}</h1>
+        <h2>Grade Level: {{ grade_level }}</h2>
+        <h2>Number of Students: {{ num_students }}</h2>
+        <h2>State: {{ state }}</h2>
+        <br>
+        {% for key, value in unit_plan.items() %}
+            {% if key != 'Title' %}
+                <h2>{{ key.replace(':', '') }}</h2>
+                <p>{{ value }}</p>
+            {% endif %}
+        {% endfor %}
+        {% if worksheet_content %}
+        <br>
+        <h2>Worksheet</h2>
+        <ul>
+            {% for question in worksheet_content.split('----') %}
+                <li>{{ question.split('Answer:')[0] }}</li>
+            {% endfor %}
+        </ul>
         {% endif %}
-    {% endfor %}
+        {% if fact_sheet_content %}
+        <br>
+        <h2>Fact Sheet</h2>
+        <p>{{ fact_sheet_content }}</p>
+        {% endif %}
+        {% if answer_bank_content %}
+        <br>
+        <h2>Answer Bank</h2>
+        <ul>
+            {% for question in answer_bank_content.split('----') %}
+                <li>{{ question.split('Question:')[1] }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <!-- Form to download as a Word document -->
+        <form method="post" action="{{ url_for('output') }}">
+            <input type="hidden" name="download_word" value="true">
+            <button type="submit">Download as Word Document</button>
+        </form>
+        <!-- Button to return home -->
+        <a href="{{ url_for('landing') }}" class="btn btn-primary mt-3">Return Home</a>
+    </div>
 </body>
 </html>
-
-
-

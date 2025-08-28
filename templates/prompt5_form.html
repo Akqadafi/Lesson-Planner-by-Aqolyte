@@ -1,0 +1,134 @@
+{% extends 'landing.html' %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="text-center w-50">
+        <h2>Exploration Lesson Plan</h2>
+        <form method="POST">
+            <input type="hidden" name="prompt" value="{{ prompt }}">
+            <div class="form-group">
+                <label for="topic">Topic:</label>
+                <input type="text" class="form-control" id="topic" name="topic" required>
+            </div>
+            <div class="form-group">
+                <label for="number_of_words">Number of Words:</label>
+                <input type="number" class="form-control" id="number_of_words" name="number_of_words" required>
+            </div>
+            <div class="form-group">
+                <label for="grade_level">Grade Level:</label>
+                <input type="number" class="form-control" id="grade_level" name="grade_level" min="0" max="12" required>
+            </div>
+            <div class="form-group">
+                <label for="number_of_students">Number of Students:</label>
+                <input type="number" class="form-control" id="number_of_students" name="number_of_students" required>
+            </div>
+            <div class="form-group">
+                <label>Culture Group:</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="black" name="culture_group" value="Black">
+                    <label class="form-check-label" for="black">Black</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="latino" name="culture_group" value="Latino">
+                    <label class="form-check-label" for="latino">Latino</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="white" name="culture_group" value="White">
+                    <label class="form-check-label" for="white">White</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="asian" name="culture_group" value="Asian">
+                    <label class="form-check-label" for="asian">Asian</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="american_indian" name="culture_group" value="American Indian">
+                    <label class="form-check-label" for="american_indian">American Indian</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="socioeconomic_level">Socioeconomic Level:</label>
+                <select class="form-control" id="socioeconomic_level" name="socioeconomic_level" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="experiential_type">Experiential Type:</label>
+                <input type="text" class="form-control" id="experiential_type" name="experiential_type" required>
+            </div>
+            <div class="form-group">
+                <label>Additional Needs:</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="disabled" name="disabled" value="True">
+                    <label class="form-check-label" for="disabled">Disabled</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="ell" name="ell" value="True">
+                    <label class="form-check-label" for="ell">ELL</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="gifted" name="gifted" value="True">
+                    <label class="form-check-label" for="gifted">Gifted</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="state">State:</label>
+                <select class="form-control" id="state" name="state" required>
+                    <option value="Alabama">Alabama</option>
+                    <option value="Alaska">Alaska</option>
+                    <option value="Arizona">Arizona</option>
+                    <option value="Arkansas">Arkansas</option>
+                    <option value="California">California</option>
+                    <option value="Colorado">Colorado</option>
+                    <option value="Connecticut">Connecticut</option>
+                    <option value="Delaware">Delaware</option>
+                    <option value="Florida">Florida</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Hawaii">Hawaii</option>
+                    <option value="Idaho">Idaho</option>
+                    <option value="Illinois">Illinois</option>
+                    <option value="Indiana">Indiana</option>
+                    <option value="Iowa">Iowa</option>
+                    <option value="Kansas">Kansas</option>
+                    <option value="Kentucky">Kentucky</option>
+                    <option value="Louisiana">Louisiana</option>
+                    <option value="Maine">Maine</option>
+                    <option value="Maryland">Maryland</option>
+                    <option value="Massachusetts">Massachusetts</option>
+                    <option value="Michigan">Michigan</option>
+                    <option value="Minnesota">Minnesota</option>
+                    <option value="Mississippi">Mississippi</option>
+                    <option value="Missouri">Missouri</option>
+                    <option value="Montana">Montana</option>
+                    <option value="Nebraska">Nebraska</option>
+                    <option value="Nevada">Nevada</option>
+                    <option value="New Hampshire">New Hampshire</option>
+                    <option value="New Jersey">New Jersey</option>
+                    <option value="New Mexico">New Mexico</option>
+                    <option value="New York">New York</option>
+                    <option value="North Carolina">North Carolina</option>
+                    <option value="North Dakota">North Dakota</option>
+                    <option value="Ohio">Ohio</option>
+                    <option value="Oklahoma">Oklahoma</option>
+                    <option value="Oregon">Oregon</option>
+                    <option value="Pennsylvania">Pennsylvania</option>
+                    <option value="Rhode Island">Rhode Island</option>
+                    <option value="South Carolina">South Carolina</option>
+                    <option value="South Dakota">South Dakota</option>
+                    <option value="Tennessee">Tennessee</option>
+                    <option value="Texas">Texas</option>
+                    <option value="Utah">Utah</option>
+                    <option value="Vermont">Vermont</option>
+                    <option value="Virginia">Virginia</option>
+                    <option value="Washington">Washington</option>
+                    <option value="West Virginia">West Virginia</option>
+                    <option value="Wisconsin">Wisconsin</option>
+                    <option value="Wyoming">Wyoming</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg mt-3">Submit</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

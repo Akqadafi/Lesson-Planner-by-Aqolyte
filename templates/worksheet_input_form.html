@@ -1,0 +1,41 @@
+{% extends 'landing.html' %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="text-center w-50">
+        <h2>Create a Worksheet</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="topic">Topic:</label>
+                <input type="text" class="form-control" id="topic" name="topic" required>
+            </div>
+            <div class="form-group">
+                <label for="question_types">Question Types:</label>
+                <select class="form-control" id="question_types" name="question_types" required>
+                    <option value="multiple_choice">Multiple Choice</option>
+                    <option value="short_answer">Short Answer</option>
+                    <option value="essay">Essay</option>
+                    <option value="true_false">True/False</option>
+                    <option value="matching">Matching</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="num_questions">Number of Questions:</label>
+                <input type="number" class="form-control" id="num_questions" name="num_questions" required>
+            </div>
+            <div class="form-group">
+                <label for="delimiter">Formatting Delimiter:</label>
+<select class="form-control" id="delimiter" name="delimiter" required>
+    <option value="----">Horizontal Line (----)</option>
+    <option value="###">Hashes (###)</option>
+    <option value="[---]">Square Brackets ([---])</option>
+    <option value="\n\n">Double Line Breaks</option>
+    <option value=">>>">Special Characters (>>>)</option>
+</select>
+</div>
+<button type="submit" class="btn btn-primary btn-lg mt-3">Submit</button>
+</form>
+</div>
+</div>
+
+{% endblock %}

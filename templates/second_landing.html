@@ -1,0 +1,12 @@
+{% extends 'landing.html' %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="text-center">
+	<img src="{{ url_for('static', filename='img/logo2.png') }}" class="logo-banner mb-4" alt="Lesson Planner Logo">
+        <h1 class="display-4 mb-4">Welcome to the Lesson Plan Printer!</h1>
+        <p class="lead mb-4">Your ultimate tool for creating and managing lesson plans effortlessly.</p>
+        <a href="{{ url_for('choose') }}" class="btn btn-primary btn-lg">Start Crafting</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'landing.html' %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="display-4 mb-4">
+        Select Method for {{ 'Lesson Plan' if type == 'lesson_plan' else 'Worksheet' }}
+    </h1>
+    <p class="lead mb-5">Choose how you'd like to create your {{ 'lesson plan' if type == 'lesson_plan' else 'worksheet' }}:</p>
+
+    <form method="POST" class="mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-3">
+                <button type="submit" name="method" value="chatbot" class="btn btn-outline-primary btn-lg btn-block py-3">
+                    Use GPT Chatbot
+                </button>
+            </div>
+            <div class="col-md-4 mb-3">
+                <button type="submit" name="method" value="prompt_selection" class="btn btn-primary btn-lg btn-block py-3">
+                    Use Guided Prompt
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
