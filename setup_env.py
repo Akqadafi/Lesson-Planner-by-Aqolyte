@@ -1,24 +1,23 @@
+from pathlib import Path
 import subprocess
 import sys
-import os
 
-# Define the path to your app's directory
-app_dir_path = r'Q:\AI\LPAPP\Lesson Planner App v 094(Back to Basics) Works!_WordDL - Simplified - Copy'
 
-# Define the virtual environment path
-venv_path = os.path.join(app_dir_path, 'venv')
+APP_DIR = Path(__file__).resolve().parent
+VENV_DIR = APP_DIR / ".venv"
 
-# Create the virtual environment
-subprocess.run([sys.executable, '-m', 'venv', venv_path])
 
-# Path to the activate script
-activate_script = os.path.join(venv_path, 'Scripts', 'activate')
-if not os.path.exists(activate_script):  # For non-Windows systems
-    activate_script = os.path.join(venv_path, 'bin', 'activate')
+def main() -> None:
+    subprocess.run([sys.executable, "-m", "venv", str(VENV_DIR)], check=True)
+    python = VENV_DIR / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
+    subprocess.run([str(python), "-m", "pip", "install", "--upgrade", "pip"], check=True)
+    subprocess.run(
+        [str(python), "-m", "pip", "install", "-r", str(APP_DIR / "requirements.txt")],
+        check=True,
+    )
+    print(f"Environment ready: {VENV_DIR}")
+    print("Copy .env.example to .env and add your secrets before starting the app.")
 
-# Install dependencies from requirements.txt
-requirements_file_path = os.path.join(app_dir_path, 'requirements.txt')
-pip_install_command = [os.path.join(venv_path, 'Scripts', 'pip'), 'install', '-r', requirements_file_path]
 
-# Execute the command to install dependencies
-subprocess.run(pip_install_command)
+if __name__ == "__main__":
+    main()

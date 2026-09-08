@@ -1,9 +1,7 @@
-Flask==2.3.2
-openai==0.27.8
-gunicorn==20.1
-Jinja2==3.1.2
-python-dotenv
-python-docx==0.8.11
-beautifulsoup4==4.10.0
-pypandoc==1.6.4
-
+Flask>=3.1,<4
+Flask-Session>=0.8,<1
+openai>=2,<3
+gunicorn>=23,<24
+python-dotenv>=1.0,<2
+python-docx>=1.1,<2
+beautifulsoup4>=4.12,<5
