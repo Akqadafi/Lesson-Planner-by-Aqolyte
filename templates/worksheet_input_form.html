@@ -3,14 +3,14 @@
 {% block content %}
 <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="text-center w-50">
-        <h2>Create a Worksheet</h2>
+        <h2>Create a Worksheet</h2><p>Generated answers need teacher review before classroom use.</p><a href="/builder/">Back to lesson studio</a>
         <form method="POST">
             <div class="form-group">
                 <label for="topic">Topic:</label>
                 <input type="text" class="form-control" id="topic" name="topic" required>
             </div>
             <div class="form-group">
-                <label for="question_types">Question Types:</label>
+                <label for="grade_level">Grade (0 = kindergarten)</label><input id="grade_level" name="grade_level" type="number" min="0" max="12" value="5" required><label for="question_types">Question Types:</label>
                 <select class="form-control" id="question_types" name="question_types" required>
                     <option value="multiple_choice">Multiple Choice</option>
                     <option value="short_answer">Short Answer</option>
@@ -21,7 +21,7 @@
             </div>
             <div class="form-group">
                 <label for="num_questions">Number of Questions:</label>
-                <input type="number" class="form-control" id="num_questions" name="num_questions" required>
+                <input type="number" class="form-control" id="num_questions" name="num_questions" min="1" max="50" required>
             </div>
             <div class="form-group">
                 <label for="delimiter">Formatting Delimiter:</label>

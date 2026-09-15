@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, send_file, session, url_for
 from flask_session import Session
 
+from builder import bp as builder_blueprint
+
 import lesson_planner
 from worksheet_generator import generate_worksheet
 
@@ -32,8 +34,16 @@ app.config.update(
     SESSION_FILE_DIR=str(BASE_DIR / "instance" / "sessions"),
     SESSION_PERMANENT=False,
     SESSION_USE_SIGNER=True,
+    MAX_CONTENT_LENGTH=1024 * 1024,
 )
 Session(app)
+app.register_blueprint(builder_blueprint)
+
+
+def clear_generation_session():
+    # Moving between legacy tools must not discard an in-progress modular draft.
+    for key in ('prompt', 'input_data', 'worksheet_data', 'content', 'content_type'):
+        session.pop(key, None)
 
 
 def _is_enabled(name: str) -> bool:
@@ -115,10 +125,10 @@ def clear_cache():
 def redirect_choice():
     choice = request.form.get("choice")
     if choice == "lesson":
-        session.clear()
+        clear_generation_session()
         return redirect(url_for("prompt_selection"))
     if choice == "worksheet":
-        session.clear()
+        clear_generation_session()
         return redirect(url_for("worksheet"))
     return redirect(url_for("landing"))
 
@@ -129,10 +139,10 @@ def prompt_selection():
         prompt = request.form.get("prompt", "")
         if prompt not in lesson_planner.SECTION_ORDER:
             return "Invalid lesson-plan type.", 400
-        session.clear()
+        clear_generation_session()
         session["prompt"] = prompt
         return redirect(url_for("home"))
-    return render_template("prompt_selection.html")
+    return redirect(url_for("builder.index"))
 
 
 @app.route("/home", methods=["GET", "POST"])
@@ -145,6 +155,10 @@ def home():
         input_data["prompt"] = session.get("prompt")
         if input_data["prompt"] not in lesson_planner.SECTION_ORDER:
             return redirect(url_for("prompt_selection"))
+        try:
+            lesson_planner.validate_input(input_data)
+        except ValueError as exc:
+            return str(exc), 400
         session.pop("worksheet_data", None)
         session.pop("content", None)
         session.pop("content_type", None)
@@ -164,10 +178,19 @@ def worksheet():
             num_questions = int(request.form["num_questions"])
             if not 1 <= num_questions <= 50:
                 raise ValueError("Number of questions must be between 1 and 50.")
-            session.clear()
+            if request.form.get("question_types") not in {"multiple_choice", "short_answer", "essay", "true_false", "matching", "Short Answer Questions", "Fill in the Blanks", "Matching", "Mix"}:
+                raise ValueError("Invalid question type")
+            if not request.form.get("topic", "").strip() or len(request.form["topic"]) > 300:
+                raise ValueError("Invalid topic")
+            if not 0 <= int(request.form.get("grade_level", "5")) <= 12:
+                raise ValueError("Invalid grade")
+            session.pop("input_data", None)
+            session.pop("content", None)
+            session.pop("content_type", None)
             session["worksheet_data"] = {
                 "topic": request.form["topic"].strip(),
                 "question_types": request.form["question_types"],
+                "grade_level": int(request.form.get("grade_level", "5")),
                 "num_questions": num_questions,
                 "formatting_delimiter": request.form.get("delimiter", "----"),
             }
@@ -229,6 +252,7 @@ def output():
                 worksheet_data["num_questions"],
                 worksheet_data["question_types"],
                 worksheet_data["formatting_delimiter"],
+                grade_level=worksheet_data.get("grade_level", 5),
             )
             session["content_type"] = "Worksheet"
             session["content"] = generated

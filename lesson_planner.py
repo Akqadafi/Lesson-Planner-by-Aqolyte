@@ -81,7 +81,21 @@ def _lesson_blueprint(input_data: dict) -> str:
     raise ValueError(f"Invalid prompt selected: {prompt_type}")
 
 
+def validate_input(data):
+    for name, low, high in [('grade_level', 0, 12), ('number_of_students', 1, 100), ('number_of_words', 50, 5000)]:
+        try:
+            value = int(data.get(name, ''))
+        except (TypeError, ValueError):
+            raise ValueError(f'{name} must be a whole number.')
+        if not low <= value <= high:
+            raise ValueError(f'{name} must be between {low} and {high}.')
+    topic = str(data.get('topic', '')).strip()
+    if not topic or len(topic) > 300:
+        raise ValueError('Enter a topic of 1–300 characters.')
+
+
 def generate_lesson_plan(input_data: dict) -> tuple[dict[str, str], list[str]]:
+    validate_input(input_data)
     prompt_type = _required(input_data, "prompt")
     if prompt_type not in SECTION_ORDER:
         raise ValueError(f"Invalid prompt selected: {prompt_type}")

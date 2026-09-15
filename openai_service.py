@@ -12,7 +12,7 @@ def get_client() -> OpenAI:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("Missing OPENAI_API_KEY. Add it to .env (never commit .env).")
-    return OpenAI(api_key=api_key)
+    return OpenAI(api_key=api_key, timeout=90.0, max_retries=1)
 
 
 def generate_text(messages: list[dict[str, str]], *, model: str | None = None) -> str:
@@ -21,6 +21,7 @@ def generate_text(messages: list[dict[str, str]], *, model: str | None = None) -
         model=model or os.getenv("OPENAI_MODEL", DEFAULT_MODEL),
         input=messages,
         store=False,
+        max_output_tokens=12000,
     )
     text = response.output_text.strip()
     if not text:

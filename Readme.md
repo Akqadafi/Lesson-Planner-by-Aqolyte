@@ -44,3 +44,41 @@ python -m unittest discover -s tests -v
 ## Security
 
 Never commit `.env`, API keys, generated logs, or user data. See [SECURITY.md](SECURITY.md) for credential-rotation guidance.
+
+
+## Modular lesson studio
+
+Open `/builder/` to use a preset, customize a preset, or build from scratch.
+The six existing instructional types remain available. Exploration now includes inquiry;
+Skill Development includes explicit instruction. Backward Design and multi-session
+Project-Based Learning are additional presets. Classroom, station-based and blended
+learning are delivery options across approaches.
+
+1. Choose a path, approach, sections, grade, session duration and classroom context.
+2. Create an outline. This makes no AI request. Write sections yourself or generate them.
+3. Save edits before rearranging, adding/removing or regenerating sections.
+4. Review factual claims, standards, activities, exercise answers and timing.
+5. Mark the draft teacher-reviewed and download Word. Any change clears that status.
+
+Only one modular draft is stored in the browser's server-side session; this is not a
+permanent lesson library. Download before replacing it. Separate tabs share the draft;
+stale submissions are rejected. Opening legacy worksheets preserves the modular draft.
+
+### What checks mean
+
+AI output must be JSON containing every requested section exactly once with nonempty
+text. Invalid output and API failures leave the previous draft intact. Input bounds,
+CSRF protection on builder mutations, and revision checks guard the editing workflow.
+The app flags missing objectives, assessment, answer keys and source context.
+
+Source excerpts are teacher supplied. URLs are not fetched; citations, source quality,
+standards alignment, factual accuracy, timing and answer correctness are NOT independently
+verified. Prompt instructions request evidence and uncertainty labels but do not guarantee
+compliance. Teacher review is an acknowledgement, not certification. Independent retrieval,
+claim verification and mathematical answer validation remain future work.
+
+The app is a local prototype: it has no authentication, persistent user library, deployment
+rate limits, or independent educational-quality evaluation. Do not expose its paid generation
+routes publicly without access and usage controls. Do not enter student identifying records.
+
+Tests use mocked AI responses. Real-model output quality must be evaluated separately.
