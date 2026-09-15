@@ -71,3 +71,6 @@ pnpm-debug.log*
 # uploads/
 # data/
 # media/
+
+# Modular lesson session data
+/instance/
