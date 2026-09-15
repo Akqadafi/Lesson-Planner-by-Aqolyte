@@ -21,16 +21,31 @@ def gpt4_request(messages):
     return generate_text(messages)
 
 
-def parse_lesson_plan(lesson_plan_text: str) -> dict[str, str]:
-    pattern = re.compile(
-        r"^\s*Section:\s*(.+?)\s*\r?\nContent:\s*(.*?)(?=^\s*Section:|\Z)",
-        re.MULTILINE | re.DOTALL,
-    )
-    sections = {
-        title.strip(): content.strip()
-        for title, content in pattern.findall(lesson_plan_text.strip())
-    }
-    return sections or {"Lesson Plan": lesson_plan_text.strip()}
+class LessonFormatError(ValueError):
+    """The model response is not a complete lesson draft."""
+
+
+def parse_lesson_plan(lesson_plan_text: str, expected_sections=None) -> dict[str, str]:
+    message = 'The generated lesson was incomplete or incorrectly formatted. Please retry; your inputs have been kept.'
+    if not isinstance(lesson_plan_text, str) or not lesson_plan_text.strip():
+        raise LessonFormatError(message)
+    blocks = re.split(r'(?=^[ \t]*Section:)', lesson_plan_text.strip(), flags=re.MULTILINE)
+    sections = {}
+    for block in blocks:
+        if not block.strip():
+            continue
+        match = re.fullmatch(r'[ \t]*Section:[ \t]*([^\r\n]+)\r?\n[ \t]*Content:[ \t]*(.*)', block.strip(), re.DOTALL)
+        if not match:
+            raise LessonFormatError(message)
+        title, content = (part.strip() for part in match.groups())
+        if not title or not content or title in sections or content == '<detailed content>':
+            raise LessonFormatError(message)
+        sections[title] = content
+    if expected_sections is not None:
+        if set(sections) != set(expected_sections):
+            raise LessonFormatError(message)
+        return {name: sections[name] for name in expected_sections}
+    return sections
 
 
 def get_samr_definition() -> str:
@@ -112,7 +127,7 @@ def generate_lesson_plan(input_data: dict) -> tuple[dict[str, str], list[str]]:
     prompt = f"""
 You are an education specialist. {_lesson_blueprint(input_data)}
 
-Make the plan comprehensive enough for a teacher to use without additional planning. Include engaging
+Create a draft for teacher review; do not claim factual accuracy or verified standards alignment. Include engaging
 introductory and concluding activities, discussions, hands-on work, assessment questions, differentiation,
 and a detailed student worksheet where appropriate.
 
@@ -138,7 +153,5 @@ Return only the following section format. Preserve each section title exactly:
             {"role": "user", "content": prompt},
         ]
     )
-    parsed = parse_lesson_plan(generated)
-    ordered_plan = {name: parsed[name] for name in ordered_sections if name in parsed}
-    ordered_plan.update({name: content for name, content in parsed.items() if name not in ordered_plan})
+    ordered_plan = parse_lesson_plan(generated, ordered_sections)
     return ordered_plan, ordered_sections

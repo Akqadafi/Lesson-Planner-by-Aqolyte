@@ -29,17 +29,15 @@ class LessonPlannerTests(unittest.TestCase):
         self.assertEqual(result["Title"], "Plant Power")
         self.assertEqual(result["Assessment"], "Exit ticket")
 
-    def test_unstructured_response_is_preserved(self):
-        self.assertEqual(
-            lesson_planner.parse_lesson_plan("A complete plan"),
-            {"Lesson Plan": "A complete plan"},
-        )
+    def test_unstructured_response_is_rejected(self):
+        with self.assertRaises(lesson_planner.LessonFormatError):
+            lesson_planner.parse_lesson_plan("A complete plan")
 
     @patch("lesson_planner.generate_text")
     def test_generate_lesson_plan_uses_safe_api_boundary(self, mock_generate):
-        mock_generate.return_value = (
-            "Section: Lesson Plan Purpose Statement\nContent: Learn photosynthesis.\n\n"
-            "Section: Assessment\nContent: Use an exit ticket."
+        mock_generate.return_value = "\n\n".join(
+            f"Section: {name}\nContent: Learn photosynthesis."
+            for name in lesson_planner.SECTION_ORDER['prompt3']
         )
         plan, order = lesson_planner.generate_lesson_plan(SAMPLE_INPUT)
 
@@ -50,7 +48,10 @@ class LessonPlannerTests(unittest.TestCase):
 
     @patch("lesson_planner.generate_text")
     def test_single_culture_string_is_not_split_into_characters(self, mock_generate):
-        mock_generate.return_value = "Section: Lesson Plan\nContent: Ready"
+        mock_generate.return_value = "\n\n".join(
+            f"Section: {name}\nContent: Ready"
+            for name in lesson_planner.SECTION_ORDER['prompt3']
+        )
         data = dict(SAMPLE_INPUT, culture_group="Latino")
         lesson_planner.generate_lesson_plan(data)
         sent_messages = mock_generate.call_args.args[0]

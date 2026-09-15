@@ -51,33 +51,9 @@ def _is_enabled(name: str) -> bool:
 
 
 def html_to_docx(html_content: str) -> BytesIO:
-    """Convert the rendered lesson or worksheet HTML to a Word document in memory."""
-    document = Document()
-    soup = BeautifulSoup(html_content, "html.parser")
-
-    for element in soup.find_all(["h1", "h2", "h3", "p", "li", "pre"]):
-        text = element.get_text(" ", strip=True)
-        if not text:
-            continue
-        if element.name == "h1":
-            document.add_heading(text, level=1)
-        elif element.name == "h2":
-            document.add_heading(text, level=2)
-        elif element.name == "h3":
-            document.add_heading(text, level=3)
-        elif element.name == "li":
-            document.add_paragraph(text, style="List Bullet")
-        elif element.name == "pre":
-            for line in text.splitlines():
-                if line.strip():
-                    document.add_paragraph(line.strip())
-        else:
-            document.add_paragraph(text)
-
-    output = BytesIO()
-    document.save(output)
-    output.seek(0)
-    return output
+    """Export block content in order, including native Word tables and lists."""
+    from word_export import export_html
+    return export_html(html_content)
 
 
 @app.route("/")
@@ -159,6 +135,8 @@ def home():
             lesson_planner.validate_input(input_data)
         except ValueError as exc:
             return str(exc), 400
+        if session.get("content_type") == "Lesson Plan" and session.get("content"):
+            session["previous_lesson"] = {key: session.get(key) for key in ("content", "content_type", "input_data")}
         session.pop("worksheet_data", None)
         session.pop("content", None)
         session.pop("content_type", None)
@@ -221,6 +199,13 @@ def _render_saved_content():
 @app.route("/output", methods=["GET", "POST"])
 def output():
     try:
+        if request.method == "POST" and request.form.get("restore_previous"):
+            previous = session.get("previous_lesson")
+            if not previous:
+                return "No previous lesson is available.", 400
+            session.update(previous)
+            session.pop("worksheet_data", None)
+            return redirect(url_for("output"))
         if request.method == "POST" and request.form.get("download_word"):
             rendered = _render_saved_content()
             content_type = session.get("content_type")
@@ -259,9 +244,11 @@ def output():
             return _render_saved_content()
 
         return "No data found. Please return to the home page and try again.", 400
+    except lesson_planner.LessonFormatError as exc:
+        return render_template("generation_error.html", message=str(exc), previous=bool(session.get("previous_lesson"))), 502
     except Exception:
         app.logger.exception("Unable to render generated content")
-        return "The content could not be generated. Please try again.", 500
+        return render_template("generation_error.html", message="Generation is unavailable. Your inputs have been kept. Please retry shortly.", previous=bool(session.get("previous_lesson"))), 503
 
 
 if __name__ == "__main__":
