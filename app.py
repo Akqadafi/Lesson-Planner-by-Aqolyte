@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, send_file, session, url_for
 from flask_session import Session
 
+from openai_service import GenerationUnavailableError
 from handouts import bp as handouts_blueprint
 from builder import bp as builder_blueprint
 
@@ -246,6 +247,8 @@ def output():
             return _render_saved_content()
 
         return "No data found. Please return to the home page and try again.", 400
+    except GenerationUnavailableError as exc:
+        return render_template("generation_error.html", message=str(exc), previous=bool(session.get("previous_lesson"))), 503
     except lesson_planner.LessonFormatError as exc:
         return render_template("generation_error.html", message=str(exc), previous=bool(session.get("previous_lesson"))), 502
     except Exception:

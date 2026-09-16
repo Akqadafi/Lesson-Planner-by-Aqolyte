@@ -5,7 +5,7 @@ from io import BytesIO
 
 from docx import Document
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_file
-from openai_service import generate_text
+from openai_service import generate_text, GenerationUnavailableError
 
 bp = Blueprint('builder', __name__, url_prefix='/builder')
 MODULES = {
@@ -208,6 +208,8 @@ def index():
             draft['revision']=secrets.token_hex(12)
             session['builder_draft']=draft
         return redirect(url_for('builder.index'))
+    except GenerationUnavailableError as exc:
+        return page(str(exc),503)
     except ValueError as exc:
         return page(str(exc),400,request.form,request.form.getlist('sections'))
     except Exception:

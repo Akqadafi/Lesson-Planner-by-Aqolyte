@@ -10,7 +10,7 @@ from docx.shared import Inches, Pt, RGBColor
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from builder import csrf, MODULES, number
-from openai_service import generate_text
+from openai_service import generate_text, GenerationUnavailableError
 
 bp=Blueprint('handouts',__name__,url_prefix='/handouts')
 TYPES = {
@@ -154,6 +154,7 @@ Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}])
             else:raise ValueError('Choose a supported action.')
             draft['handout']=h;draft['revision']=secrets.token_hex(12);session['builder_draft']=draft
             return redirect(url_for('handouts.index'))
+    except GenerationUnavailableError as exc:error=str(exc);status=503
     except ValueError as exc:error=str(exc);status=400
     except Exception:error='Generation is unavailable. Your saved worksheet is unchanged. Please retry.';status=503
     h=draft.get('handout')
