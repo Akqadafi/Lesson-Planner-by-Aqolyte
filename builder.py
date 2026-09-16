@@ -1,4 +1,5 @@
 """Modular lesson drafting. Checks structure; never certifies factual accuracy."""
+import copy
 import json
 import secrets
 from io import BytesIO
@@ -150,7 +151,7 @@ def index():
             session['builder_draft'] = {'config':config, 'sections':[{'id':i,'content':''} for i in config['sections']],
                                         'revision':secrets.token_hex(12), 'reviewed':False}
         else:
-            draft = session.get('builder_draft')
+            draft = copy.deepcopy(session.get('builder_draft'))
             if not draft or request.form.get('revision') != draft['revision']:
                 raise ValueError('This draft changed in another tab. Reload before editing.')
             if action == 'generate':

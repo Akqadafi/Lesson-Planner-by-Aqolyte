@@ -138,3 +138,13 @@ converter and its recorded Word process. LibreOffice remains the deployment reco
 
 The LibreOffice installation attempt on this computer was cancelled because its download
 was too slow; the existing Word installation supplies local PDF downloads.
+
+### Local request safety
+
+The current single-process app rejects simultaneous requests for the same session with
+HTTP 409. Wait for the active request to finish, then reload before retrying. This prevents
+local overlapping operations from overwriting session drafts. It is not cross-worker
+locking, rate limiting, or durable idempotency. Production requires shared coordination.
+`SESSION_COOKIE_SECURE=true` enables HTTPS-only cookies on a TLS deployment; leave it off
+for the local HTTP preview. `/health` reports process responsiveness; `/version` reports
+the application version. See RELIABILITY-AUDIT.md for remaining release blockers.

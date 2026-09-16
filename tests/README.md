@@ -38,3 +38,10 @@ Read a test's assertions to see exactly what it verifies. A passing test does no
 `test_handout_types.py` checks all four formats, type-specific generation guidance, exit-ticket limits, and theme changes that preserve content without AI.
 
 `test_pdf_export.py` uses simulated converter responses to check export routes, answer separation, stale-handout blocking, timeout handling, isolated profiles and temporary-file cleanup. Real LibreOffice conversion is checked separately with synthetic documents; it uses no AI credits.
+
+### September 16 reliability increment
+
+Added regression cases for atomic rejected saves, concurrent same-session generation/edit
+requests, safe health/version responses, and malformed worksheet delimiters. These tests
+mock AI calls; the concurrency test uses separate clients sharing a session and coordinates
+an in-flight model response with threading events.

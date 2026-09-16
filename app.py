@@ -9,6 +9,7 @@ from docx import Document
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, send_file, session, url_for
 from flask_session import Session
+from request_guard import SessionRequestGuard
 
 from openai_service import GenerationUnavailableError
 from handouts import bp as handouts_blueprint
@@ -36,10 +37,14 @@ app.config.update(
     SESSION_TYPE="filesystem",
     SESSION_FILE_DIR=str(BASE_DIR / "instance" / "sessions"),
     SESSION_PERMANENT=False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true",
     SESSION_USE_SIGNER=True,
     MAX_CONTENT_LENGTH=1024 * 1024,
 )
 Session(app)
+app.wsgi_app = SessionRequestGuard(app.wsgi_app, app.config["SESSION_COOKIE_NAME"])
 app.register_blueprint(builder_blueprint)
 app.register_blueprint(handouts_blueprint)
 
@@ -58,6 +63,16 @@ def html_to_docx(html_content: str) -> BytesIO:
     """Export block content in order, including native Word tables and lists."""
     from word_export import export_html
     return export_html(html_content)
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.get("/version")
+def version():
+    return {"app": "LPAPP", "version": "0.2.0"}
 
 
 @app.route("/")
@@ -166,6 +181,9 @@ def worksheet():
                 raise ValueError("Invalid topic")
             if not 0 <= int(request.form.get("grade_level", "5")) <= 12:
                 raise ValueError("Invalid grade")
+            delimiter = request.form.get("delimiter", "----")
+            if len(delimiter) > 20 or "\n" in delimiter or "\r" in delimiter:
+                raise ValueError("Invalid delimiter")
             session.pop("input_data", None)
             session.pop("content", None)
             session.pop("content_type", None)

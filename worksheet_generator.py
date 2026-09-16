@@ -15,8 +15,8 @@ QUESTION_PROMPTS = {
 
 def generate_worksheet(topic, num_questions, question_type, formatting_delimiter="----", *, grade_level=5):
     topic = str(topic).strip()
-    if not topic:
-        raise ValueError("A worksheet topic is required.")
+    if not topic or len(topic) > 300:
+        raise ValueError("Enter a worksheet topic of 1-300 characters.")
 
     num_questions = int(num_questions)
     if not 1 <= num_questions <= 50:
@@ -25,6 +25,8 @@ def generate_worksheet(topic, num_questions, question_type, formatting_delimiter
     if not 0 <= int(grade_level) <= 12:
         raise ValueError("Grade must be between 0 and 12.")
     delimiter = formatting_delimiter or "----"
+    if not isinstance(delimiter, str) or len(delimiter) > 20 or "\n" in delimiter or "\r" in delimiter:
+        raise ValueError("Use a single-line delimiter of at most 20 characters.")
     if question_type == "Mix":
         question_instruction = (
             "Use a balanced mix of short-answer, fill-in-the-blank, and matching questions."
@@ -35,7 +37,7 @@ def generate_worksheet(topic, num_questions, question_type, formatting_delimiter
         raise ValueError(f"Invalid question type: {question_type}")
 
     prompt = f"""
-Create a classroom-ready worksheet about {topic} with exactly {num_questions} questions for grade {grade_level} (0 means kindergarten).
+Create a worksheet draft about {topic} with exactly {num_questions} questions for grade {grade_level} (0 means kindergarten).
 This is an unverified teacher draft. Do not invent citations. Flag uncertain facts for review.
 {question_instruction}
 List all questions first, followed by a section titled exactly "Answers:" containing the answer key.
