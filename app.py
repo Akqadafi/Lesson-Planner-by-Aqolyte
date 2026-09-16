@@ -1,6 +1,7 @@
 import logging
 import os
 from io import BytesIO
+from pdf_export import convert_docx, PDFExportError
 from pathlib import Path
 
 from bs4 import BeautifulSoup
@@ -209,11 +210,13 @@ def output():
             session.update(previous)
             session.pop("worksheet_data", None)
             return redirect(url_for("output"))
-        if request.method == "POST" and request.form.get("download_word"):
+        if request.method == "POST" and (request.form.get("download_word") or request.form.get("download_pdf")):
             rendered = _render_saved_content()
             content_type = session.get("content_type")
             if not rendered or content_type not in {"Lesson Plan", "Worksheet"}:
                 return "No generated content is available for download.", 400
+            if request.form.get("download_pdf"):
+                return send_file(convert_docx(html_to_docx(rendered)),as_attachment=True,download_name=f"{content_type}.pdf",mimetype="application/pdf")
             return send_file(
                 html_to_docx(rendered),
                 as_attachment=True,
@@ -247,6 +250,8 @@ def output():
             return _render_saved_content()
 
         return "No data found. Please return to the home page and try again.", 400
+    except PDFExportError as exc:
+        return render_template("generation_error.html", message=str(exc), previous=False, export_error=True), 503
     except GenerationUnavailableError as exc:
         return render_template("generation_error.html", message=str(exc), previous=bool(session.get("previous_lesson"))), 503
     except lesson_planner.LessonFormatError as exc:

@@ -95,7 +95,7 @@ check that prompts themselves do not reveal answers. All content remains unverif
 
 A lesson content/configuration change flags the handout and pauses export until the teacher
 regenerates it or acknowledges reviewing its alignment. One worksheet is stored within
-the current session draft; starting a new lesson replaces it. Durable storage, image uploads and automatic PDF downloads remain planned.
+the current session draft; starting a new lesson replaces it. Durable storage and image uploads remain pending. Automatic PDF downloads require a configured converter (see below).
 No additional graphics packages are required for this initial text-based workflow.
 
 
@@ -109,3 +109,32 @@ Print-friendly exports use black text. Clean classroom adds restrained teal, blu
 accents to handout labels and sections. Both preserve the content, numbering and answer
 separation. Theme changes require no AI generation. Existing session worksheets default
 to Practice / Print-friendly. One handout per lesson remains the current limit.
+
+
+## Automatic PDF downloads
+
+Lesson Studio, student/teacher handouts, and the legacy lesson/worksheet results offer PDF
+alongside Word. PDF conversion uses the same DOCX document; no AI call is made.
+For server hosting, install LibreOffice on the machine running Flask. On Windows the default location is
+C:\Program Files\LibreOffice\program\soffice.com; on Linux use `soffice` on PATH.
+For another installation location set LIBREOFFICE_PATH to the executable (not a command).
+
+Each request has an isolated temporary directory and LibreOffice profile. Two conversions
+can run at once; further requests receive a retry message. Conversion has a 60-second
+limit, validates the PDF signature and cleans temporary documents after completion.
+Missing converters, timeout and invalid output leave drafts unchanged; Word is available.
+Use matching fonts on deployment hosts and visually check long exports. The local app
+remains a prototype; public hosting still needs access and resource controls.
+
+
+### Windows desktop conversion
+
+The default PDF_BACKEND=auto prefers LibreOffice and, on Windows with Microsoft Word
+registered, falls back to an isolated PowerShell conversion using Word. PDF_BACKEND=word
+or PDF_BACKEND=libreoffice selects explicitly. Word conversion is intended for a signed-in
+local desktop, not unattended production hosting. It runs one job at a time, disables
+macros and closes the document/application after conversion. A timeout stops the spawned
+converter and its recorded Word process. LibreOffice remains the deployment recommendation.
+
+The LibreOffice installation attempt on this computer was cancelled because its download
+was too slow; the existing Word installation supplies local PDF downloads.

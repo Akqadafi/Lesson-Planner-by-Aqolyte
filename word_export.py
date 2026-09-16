@@ -1,6 +1,6 @@
 """Small HTML-to-Word exporter for lesson material, not arbitrary page chrome."""
 from io import BytesIO
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag, Comment
 from docx import Document
 from docx.shared import Inches
 from docx.oxml import OxmlElement
@@ -12,7 +12,9 @@ def export_html(html):
     section = document.sections[0]
     section.page_width, section.page_height = Inches(8.5), Inches(11)
     soup = BeautifulSoup(html, 'html.parser')
-    for unwanted in soup.select('script,style,form,nav,header,footer'):
+    for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
+        comment.extract()
+    for unwanted in soup.select('script,style,form,nav,header,footer,a.btn'):
         unwanted.decompose()
 
     def inline(node, paragraph):

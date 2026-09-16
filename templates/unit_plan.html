@@ -48,6 +48,7 @@
             <input type="hidden" name="download_word" value="true">
             <button type="submit">Download as Word Document</button>
         </form>
+        <form method="post" action="{{ url_for('output') }}"><button name="download_pdf" value="true">Download PDF</button></form>
         <!-- Button to return home -->
         <a href="{{ url_for('landing') }}" class="btn btn-primary mt-3">Return Home</a>
     </div>

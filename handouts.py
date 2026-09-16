@@ -6,6 +6,7 @@ import secrets
 from io import BytesIO
 from flask import Blueprint, session, request, redirect, url_for, render_template, send_file
 from docx import Document
+from pdf_export import convert_docx, PDFExportError
 from docx.shared import Inches, Pt, RGBColor
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -79,6 +80,7 @@ def document(handout,teacher=False):
         elif kind!='reference':
             for _ in range(handout['space']):
                 line=doc.add_paragraph(' ')
+                line.paragraph_format.keep_with_next = _ < handout['space'] - 1
                 borders=OxmlElement('w:pBdr');border=OxmlElement('w:bottom')
                 for key,value in (('val','single'),('sz','4'),('color','AAAAAA')):
                     border.set(qn('w:'+key),value)
@@ -143,9 +145,12 @@ Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}])
                 theme=request.form.get('theme',h.get('theme','print'));accent=request.form.get('accent',h.get('accent','teal'))
                 if theme not in THEMES or accent not in ACCENTS:raise ValueError('Choose a supported theme and accent color.')
                 h.update(content,font=font,space=space,paper=paper,theme=theme,accent=accent)
-            elif action in ('student','teacher'):
+            elif action in ('student','teacher','student_pdf','teacher_pdf'):
                 validate(h,len(h['questions']))
                 if h['source_hash']!=fingerprint(draft):raise ValueError('The lesson changed. Regenerate the worksheet or review and confirm its alignment before exporting.')
+                if action.endswith('_pdf'):
+                    return send_file(convert_docx(document(h,action=='teacher_pdf')),as_attachment=True,
+                        download_name=('Teacher ' if action=='teacher_pdf' else 'Student ')+TYPES[h.get('kind','practice')]['name']+'.pdf',mimetype='application/pdf')
                 return send_file(document(h,action=='teacher'),as_attachment=True,
                     download_name=(('Teacher ' if action=='teacher' else 'Student ')+TYPES[h.get('kind','practice')]['name']+'.docx'),
                     mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
@@ -154,6 +159,7 @@ Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}])
             else:raise ValueError('Choose a supported action.')
             draft['handout']=h;draft['revision']=secrets.token_hex(12);session['builder_draft']=draft
             return redirect(url_for('handouts.index'))
+    except PDFExportError as exc:error=str(exc);status=503
     except GenerationUnavailableError as exc:error=str(exc);status=503
     except ValueError as exc:error=str(exc);status=400
     except Exception:error='Generation is unavailable. Your saved worksheet is unchanged. Please retry.';status=503

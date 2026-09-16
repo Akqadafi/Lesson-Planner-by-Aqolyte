@@ -12,7 +12,7 @@ These test files are stored locally alongside the app. They use Python unittest 
 
 ## Latest result
 
-2026-09-15: all 40 tests passed after adding handout types and themes.
+2026-09-15: all 50 tests passed after adding PDF export routes and failure handling.
 Detailed output: ../../lesson-export-qa/test-results.txt
 Sample Word export: ../../lesson-export-qa/table-sample.docx
 Sample rendered PDF: ../../lesson-export-qa/table-sample.pdf
@@ -36,3 +36,5 @@ Read a test's assertions to see exactly what it verifies. A passing test does no
 `test_handouts.py` covers manual creation, editing, source context, separate student/teacher exports, stale lessons, input validation and atomic generation failure recovery.
 
 `test_handout_types.py` checks all four formats, type-specific generation guidance, exit-ticket limits, and theme changes that preserve content without AI.
+
+`test_pdf_export.py` uses simulated converter responses to check export routes, answer separation, stale-handout blocking, timeout handling, isolated profiles and temporary-file cleanup. Real LibreOffice conversion is checked separately with synthetic documents; it uses no AI credits.

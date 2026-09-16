@@ -4,6 +4,7 @@ import secrets
 from io import BytesIO
 
 from docx import Document
+from pdf_export import convert_docx, PDFExportError
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_file
 from openai_service import generate_text, GenerationUnavailableError
 
@@ -189,7 +190,7 @@ def index():
                 if any(not r['content'].strip() for r in draft['sections']):
                     raise ValueError('Complete or remove empty sections before marking this draft reviewed.')
                 draft['reviewed'] = True
-            elif action == 'export':
+            elif action in ('export','export_pdf'):
                 doc = Document()
                 doc.add_heading(draft['config']['topic'],0)
                 doc.add_paragraph('Teacher reviewed' if draft['reviewed'] else 'Unverified draft — teacher review required')
@@ -198,6 +199,8 @@ def index():
                     for line in row['content'].splitlines():
                         doc.add_paragraph(line)
                 stream=BytesIO(); doc.save(stream); stream.seek(0)
+                if action=='export_pdf':
+                    return send_file(convert_docx(stream),as_attachment=True,download_name='Lesson plan.pdf',mimetype='application/pdf')
                 return send_file(stream,as_attachment=True,download_name='Lesson plan.docx',
                     mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
             else:
@@ -208,6 +211,8 @@ def index():
             draft['revision']=secrets.token_hex(12)
             session['builder_draft']=draft
         return redirect(url_for('builder.index'))
+    except PDFExportError as exc:
+        return page(str(exc),503)
     except GenerationUnavailableError as exc:
         return page(str(exc),503)
     except ValueError as exc:
