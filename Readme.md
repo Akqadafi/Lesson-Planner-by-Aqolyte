@@ -95,6 +95,17 @@ check that prompts themselves do not reveal answers. All content remains unverif
 
 A lesson content/configuration change flags the handout and pauses export until the teacher
 regenerates it or acknowledges reviewing its alignment. One worksheet is stored within
-the current session draft; starting a new lesson replaces it. Durable storage, additional
-handout types, color themes, image uploads and automatic PDF downloads remain planned.
+the current session draft; starting a new lesson replaces it. Durable storage, image uploads and automatic PDF downloads remain planned.
 No additional graphics packages are required for this initial text-based workflow.
+
+
+### Handout types and themes
+
+Choose Practice worksheet, Guided notes, Reference sheet or Exit ticket when creating
+an outline. Exit tickets allow up to five checks. Reference sheets contain student-facing
+explanations and examples, with no blank writing lines; teacher-only guidance remains separate.
+
+Print-friendly exports use black text. Clean classroom adds restrained teal, blue or plum
+accents to handout labels and sections. Both preserve the content, numbering and answer
+separation. Theme changes require no AI generation. Existing session worksheets default
+to Practice / Print-friendly. One handout per lesson remains the current limit.
