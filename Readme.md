@@ -82,3 +82,19 @@ rate limits, or independent educational-quality evaluation. Do not expose its pa
 routes publicly without access and usage controls. Do not enter student identifying records.
 
 Tests use mocked AI responses. Real-model output quality must be evaluated separately.
+
+
+## Student practice handouts
+
+After saving a lesson section, open Student handouts from the builder. Create an outline
+with 1–20 exercises; enter questions and answers manually or generate them from the
+selected section. Save before exporting separate student and teacher Word copies.
+The print-friendly design supports 10–18 pt text, 1–8 writing lines and Letter/A4 paper.
+Answers are stored separately and omitted from the student export; teachers must still
+check that prompts themselves do not reveal answers. All content remains unverified.
+
+A lesson content/configuration change flags the handout and pauses export until the teacher
+regenerates it or acknowledges reviewing its alignment. One worksheet is stored within
+the current session draft; starting a new lesson replaces it. Durable storage, additional
+handout types, color themes, image uploads and automatic PDF downloads remain planned.
+No additional graphics packages are required for this initial text-based workflow.

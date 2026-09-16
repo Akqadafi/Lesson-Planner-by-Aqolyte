@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, send_file, session, url_for
 from flask_session import Session
 
+from handouts import bp as handouts_blueprint
 from builder import bp as builder_blueprint
 
 import lesson_planner
@@ -38,6 +39,7 @@ app.config.update(
 )
 Session(app)
 app.register_blueprint(builder_blueprint)
+app.register_blueprint(handouts_blueprint)
 
 
 def clear_generation_session():
