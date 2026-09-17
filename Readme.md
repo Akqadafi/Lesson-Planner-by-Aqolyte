@@ -185,3 +185,15 @@ and answer-key view. Invalid output returns a retry page without saving partial 
 inputs and the separate modular draft remain intact. This is application-side validation,
 not API-enforced Structured Outputs, factual verification, or proof of answer correctness.
 Legacy lesson context fields now have type/length bounds and cultural-context list limits.
+
+## Question types and form recovery
+
+Multiple-choice worksheets require exactly four distinct A-D options and an answer label
+with explanation. True/false answers require an explicit truth value and explanation.
+Matching items require 2-10 labeled entries in each column and complete one-to-one answer
+mappings. Fill-in-the-blank items require a blank. Short-answer, essay and legacy Mix retain
+the basic completeness contract; Mix does not yet validate each item's subtype. These are
+format checks, not semantic correctness or independent verification.
+
+Invalid legacy lesson/worksheet submissions re-render escaped submitted values and an
+error message, retaining text, selections and checkboxes without changing saved content.

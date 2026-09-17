@@ -98,6 +98,11 @@ class BuilderTests(unittest.TestCase):
     def test_real_worksheet_choices(self,mock):
         soup=BeautifulSoup(self.client.get('/worksheet').data,'html.parser')
         for choice in soup.select('[name=question_types] option'):
+            question,answer='Question','Answer'
+            if choice['value']=='multiple_choice':question,answer='Choose\nA. One\nB. Two\nC. Three\nD. Four','A. Explanation'
+            if choice['value']=='true_false':answer='True: Explanation'
+            if choice['value']=='matching':question,answer='L1: One\nL2: Two\nR1: First\nR2: Second','L1=R1\nL2=R2'
+            mock.return_value=json.dumps({'questions':[{'id':i,'question':question,'answer':answer} for i in range(1,5)]})
             response=self.client.post('/worksheet',data={'topic':'Fractions','grade_level':'4','num_questions':'4','question_types':choice['value']},follow_redirects=True)
             response=self.client.post('/output',data={'generate':'1'},follow_redirects=True)
             self.assertEqual(response.status_code,200,choice['value'])

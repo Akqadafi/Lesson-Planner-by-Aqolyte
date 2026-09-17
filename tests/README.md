@@ -58,3 +58,6 @@ output rejection. Counter tests use temporary databases; provider calls are mock
 Worksheet contract tests reject missing/extra items, duplicate or noninteger IDs, missing
 and empty answers, oversized fields, and malformed JSON. Route coverage verifies retry
 behavior and preservation of inputs and unrelated drafts. No live model calls are made.
+
+Type/recovery tests cover valid and broken option labels, duplicate choices, incomplete
+matching maps, true/false formatting, and escaped restoration of text/select/checkbox values.

@@ -38,3 +38,10 @@ IDs, bounded/nonempty questions and answers, no unexpected fields, and explicit 
 output recovery. Added legacy lesson context text/list validation before AI calls.
 Still pending: type-specific checks (e.g. four multiple-choice options), factual/answer
 verification, enum audit, complete form-value recovery, and API-enforced schemas.
+
+## Question-type and recovery increment
+
+Added multiple-choice, true/false, matching and blank-format checks. Legacy form validation
+errors now retain submitted text, selects and checkboxes, with escaped values. Remaining:
+per-item subtype validation for Mix, semantic answer checks, full enum/claims audit, and
+production coordination/idempotency. Milestone 1 remains open.

@@ -64,6 +64,42 @@ def protect_legacy_forms():
             return "This form expired. Reload the form and try again. Your saved work is unchanged.", 400
 
 
+def legacy_form(template, values=None, error=None):
+    html = render_template(template)
+    if values is None:
+        return html
+    soup = BeautifulSoup(html, 'html.parser')
+    for field in soup.select('input[name], select[name], textarea[name]'):
+        name = field['name']
+        if field.get('type') in {'hidden', 'submit'}:
+            continue
+        submitted = values.getlist(name)
+        if field.get('type') in {'checkbox', 'radio'}:
+            field.attrs.pop('checked', None)
+            if field.get('value', 'on') in submitted:
+                field['checked'] = ''
+        elif field.name == 'select':
+            for option in field.find_all('option'):
+                option.attrs.pop('selected', None)
+                if option.get('value', option.text) in submitted:
+                    option['selected'] = ''
+            known = {option.get('value', option.text) for option in field.find_all('option')}
+            for value in submitted:
+                if value not in known:
+                    option = soup.new_tag('option', attrs={'value':value, 'selected':''})
+                    option.string = value + ' (choose a supported option)'
+                    field.append(option)
+        elif field.name == 'textarea':
+            field.string = values.get(name, '')
+        else:
+            field['value'] = values.get(name, '')
+    if error:
+        alert = soup.new_tag('p', attrs={'role':'alert'})
+        alert.string = error
+        soup.find('form').insert_before(alert)
+    return str(soup)
+
+
 def clear_generation_session():
     # Moving between legacy tools must not discard an in-progress modular draft.
     for key in ('prompt', 'input_data', 'worksheet_data', 'content', 'content_type'):
@@ -168,7 +204,7 @@ def home():
         try:
             lesson_planner.validate_input(input_data)
         except ValueError as exc:
-            return str(exc), 400
+            return legacy_form(f"prompt{input_data['prompt'][-1]}_form.html", request.form, str(exc)), 400
         if session.get("content_type") == "Lesson Plan" and session.get("content"):
             session["previous_lesson"] = {key: session.get(key) for key in ("content", "content_type", "input_data")}
         session.pop("worksheet_data", None)
@@ -212,7 +248,7 @@ def worksheet():
             return redirect(url_for("output"))
         except (KeyError, ValueError):
             app.logger.exception("Invalid worksheet form submission")
-            return "Please check the worksheet fields and try again.", 400
+            return legacy_form("worksheet_input_form.html", request.form, "Please check the worksheet fields and try again."), 400
     return render_template("worksheet_input_form.html")
 
 

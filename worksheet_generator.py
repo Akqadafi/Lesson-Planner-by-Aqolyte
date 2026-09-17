@@ -1,4 +1,5 @@
 import json
+import re
 from openai_service import generate_text
 
 
@@ -41,6 +42,15 @@ def generate_worksheet(topic, num_questions, question_type, formatting_delimiter
     else:
         raise ValueError(f"Invalid question type: {question_type}")
 
+    rules = {
+        'multiple_choice': 'In question put exactly four distinct choices on separate lines labeled A. through D. Start answer with the correct letter and a period, followed by explanation.',
+        'true_false': 'Start answer with True: or False: followed by an explanation.',
+        'matching': 'Each question is one matching set. In question use separate lines L1: item, L2: item (up to L10) and R1: option, R2: option (up to R10). Include equal left/right counts. Start answer with one L1=R2 mapping per line, covering each label exactly once; put explanation after mappings.',
+        'Fill in the Blanks': 'Include ___ in each question for the student to fill in.'
+    }
+    canonical = 'matching' if question_type == 'Matching' else question_type
+    question_instruction += ' ' + rules.get(canonical, '')
+
     prompt = f"""
 Create a worksheet draft about {topic} with exactly {num_questions} questions for grade {grade_level} (0 means kindergarten).
 This is an unverified teacher draft. Do not invent citations. Flag uncertain facts for review.
@@ -72,8 +82,34 @@ Include all choices or matching columns inside question where needed. Never put 
                 raise ValueError()
             if any(not isinstance(row[key], str) or not row[key].strip() or len(row[key]) > 4000 for key in ('question', 'answer')):
                 raise ValueError()
+            validate_type(row, canonical)
         questions = ('\n' + delimiter + '\n').join(f"{r['id']}. {r['question'].strip()}" for r in rows)
         answers = ('\n' + delimiter + '\n').join(f"{r['id']}. {r['answer'].strip()}" for r in rows)
         return questions + '\n\nAnswers:\n' + answers
     except (ValueError, TypeError, KeyError):
         raise WorksheetFormatError('The worksheet did not contain the requested questions and matching answers. Your inputs are saved; please retry.') from None
+
+
+def validate_type(row, kind):
+    question, answer = row['question'], row['answer']
+    if kind == 'multiple_choice':
+        choices = re.findall(r'^([A-Z])\.\s+([^\n]+)', question, re.MULTILINE)
+        if [key for key, _ in choices] != list('ABCD') or len({value.strip().casefold() for _, value in choices}) != 4:
+            raise ValueError('Four distinct choices required')
+        if not re.match(r'^[A-D]\.\s+\S', answer.strip()):
+            raise ValueError('Answer must reference a choice and explain it')
+    elif kind == 'true_false':
+        if not re.match(r'^(True|False):\s+\S', answer.strip()):
+            raise ValueError('Truth value and explanation required')
+    elif kind == 'matching':
+        labels = re.findall(r'^([LR]\d+):\s+([^\n]+)', question, re.MULTILINE)
+        left = [key for key, _ in labels if key.startswith('L')]
+        right = [key for key, _ in labels if key.startswith('R')]
+        count = len(left)
+        if not 2 <= count <= 10 or left != [f'L{i}' for i in range(1,count+1)] or right != [f'R{i}' for i in range(1,count+1)]:
+            raise ValueError('Complete matching columns required')
+        pairs = re.findall(r'^(L\d+)=(R\d+)\s*$', answer, re.MULTILINE)
+        if len(pairs) != count or {a for a,b in pairs} != set(left) or {b for a,b in pairs} != set(right):
+            raise ValueError('Complete one-to-one answer mappings required')
+    elif kind == 'Fill in the Blanks' and '___' not in question:
+        raise ValueError('Blank required')
