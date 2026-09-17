@@ -103,6 +103,8 @@ class BuilderTests(unittest.TestCase):
             if choice['value']=='true_false':answer='True: Explanation'
             if choice['value']=='matching':question,answer='L1: One\nL2: Two\nR1: First\nR2: Second','L1=R1\nL2=R2'
             mock.return_value=json.dumps({'questions':[{'id':i,'question':question,'answer':answer} for i in range(1,5)]})
+            if choice['value']=='Mix':
+                mock.return_value=json.dumps({'questions':[{'id':1,'type':'short_answer','question':'Question','answer':'Answer'},{'id':2,'type':'Fill in the Blanks','question':'Fill ___','answer':'Blank'},{'id':3,'type':'matching','question':'L1: One\nL2: Two\nR1: First\nR2: Second','answer':'L1=R1\nL2=R2'},{'id':4,'type':'short_answer','question':'Question','answer':'Answer'}]})
             response=self.client.post('/worksheet',data={'topic':'Fractions','grade_level':'4','num_questions':'4','question_types':choice['value']},follow_redirects=True)
             response=self.client.post('/output',data={'generate':'1'},follow_redirects=True)
             self.assertEqual(response.status_code,200,choice['value'])

@@ -1,4 +1,5 @@
 import re
+from legacy_choices import CHOICES
 
 from openai_service import generate_text
 
@@ -111,6 +112,11 @@ def validate_input(data):
     if not isinstance(groups, list) or len(groups) > 20 or any(not isinstance(v, str) or not v.strip() or len(v) > 100 for v in groups):
         raise ValueError('Use at most 20 context entries of 1-100 characters.')
 
+    for field in ('state', 'socioeconomic_level', 'lesson_type'):
+        if data.get(field) and data[field] not in CHOICES[field]:
+            raise ValueError(f'Choose a supported {field.replace("_", " ")}.')
+    if any(group not in CHOICES['culture_group'] for group in groups):
+        raise ValueError('Choose supported classroom context options.')
     for name, low, high in [('grade_level', 0, 12), ('number_of_students', 1, 100), ('number_of_words', 50, 5000)]:
         try:
             value = int(data.get(name, ''))
@@ -141,7 +147,7 @@ def generate_lesson_plan(input_data: dict) -> tuple[dict[str, str], list[str]]:
     prompt = f"""
 You are an education specialist. {_lesson_blueprint(input_data)}
 
-Create a draft for teacher review; do not claim factual accuracy or verified standards alignment. Include engaging
+Create a draft for teacher review; do not claim factual accuracy or verified standards alignment. Do not invent standard identifiers, citations or source URLs. Mark unsupported alignment as needing verification. Include engaging
 introductory and concluding activities, discussions, hands-on work, assessment questions, differentiation,
 and a detailed student worksheet where appropriate.
 
@@ -155,7 +161,7 @@ Class context:
 - Students with disabilities: {'yes' if input_data.get('disabled') else 'no'}
 - English-language learners: {'yes' if input_data.get('ell') else 'no'}
 - Gifted students: {'yes' if input_data.get('gifted') else 'no'}
-- State standards: {input_data.get('state') or 'not specified'}
+- Requested state (standards are not retrieved or verified): {input_data.get('state') or 'not specified'}
 
 Return only the following section format. Preserve each section title exactly:
 {output_format}

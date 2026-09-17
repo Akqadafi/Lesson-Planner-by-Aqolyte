@@ -50,12 +50,14 @@ def generate_worksheet(topic, num_questions, question_type, formatting_delimiter
     }
     canonical = 'matching' if question_type == 'Matching' else question_type
     question_instruction += ' ' + rules.get(canonical, '')
+    if canonical == 'Mix':
+        question_instruction += ' Add a type field to every item, cycling in order through short_answer, Fill in the Blanks, matching, then repeat. ' + rules['Fill in the Blanks'] + ' ' + rules['matching']
 
     prompt = f"""
 Create a worksheet draft about {topic} with exactly {num_questions} questions for grade {grade_level} (0 means kindergarten).
 This is an unverified teacher draft. Do not invent citations. Flag uncertain facts for review.
 {question_instruction}
-Return only JSON with a questions array. Each item must have exactly these fields:
+Return only JSON with a questions array. Each item must have these fields (plus type only for Mix):
 id (consecutive integer starting at 1), question (nonempty student-facing text),
 answer (nonempty teacher answer or scoring guidance). Include exactly {num_questions} items.
 Include all choices or matching columns inside question where needed. Never put teacher answers in question.
@@ -76,15 +78,21 @@ Include all choices or matching columns inside question where needed. Never put 
         if not isinstance(rows, list) or len(rows) != num_questions:
             raise ValueError()
         for index, row in enumerate(rows, 1):
-            if not isinstance(row, dict) or set(row) != {'id', 'question', 'answer'}:
+            if not isinstance(row, dict) or set(row) != ({'id', 'question', 'answer', 'type'} if canonical == 'Mix' else {'id', 'question', 'answer'}):
                 raise ValueError()
             if type(row['id']) is not int or row['id'] != index:
                 raise ValueError()
             if any(not isinstance(row[key], str) or not row[key].strip() or len(row[key]) > 4000 for key in ('question', 'answer')):
                 raise ValueError()
-            validate_type(row, canonical)
-        questions = ('\n' + delimiter + '\n').join(f"{r['id']}. {r['question'].strip()}" for r in rows)
-        answers = ('\n' + delimiter + '\n').join(f"{r['id']}. {r['answer'].strip()}" for r in rows)
+            kind = canonical
+            if canonical == 'Mix':
+                kind = ('short_answer', 'Fill in the Blanks', 'matching')[(index-1) % 3]
+                if row['type'] != kind:
+                    raise ValueError()
+            validate_type(row, kind)
+        separator = '\n\n' if delimiter == chr(92) + 'n' + chr(92) + 'n' else '\n' + delimiter + '\n'
+        questions = separator.join(f"{r['id']}. {r['question'].strip()}" for r in rows)
+        answers = separator.join(f"{r['id']}. {r['answer'].strip()}" for r in rows)
         return questions + '\n\nAnswers:\n' + answers
     except (ValueError, TypeError, KeyError):
         raise WorksheetFormatError('The worksheet did not contain the requested questions and matching answers. Your inputs are saved; please retry.') from None

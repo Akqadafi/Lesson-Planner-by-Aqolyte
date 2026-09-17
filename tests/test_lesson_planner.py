@@ -11,7 +11,7 @@ SAMPLE_INPUT = {
     "grade_level": "5",
     "number_of_students": "30",
     "culture_group": ["Black", "Latino"],
-    "socioeconomic_level": "Middle",
+    "socioeconomic_level": "Medium",
     "experiential_type": "Mixed",
     "disabled": True,
     "ell": False,

@@ -45,3 +45,17 @@ Added multiple-choice, true/false, matching and blank-format checks. Legacy form
 errors now retain submitted text, selects and checkboxes, with escaped values. Remaining:
 per-item subtype validation for Mix, semantic answer checks, full enum/claims audit, and
 production coordination/idempotency. Milestone 1 remains open.
+
+
+## Mixed worksheets, allowed choices and claims audit
+
+Added per-item mixed worksheet types and deterministic short-answer/blank/matching rotation;
+all subtype checks apply. Exposed Mixed in the form and fixed literal newline delimiters.
+Validated legacy state, socioeconomic, approach and culture selections against supported
+choices; retained bounded free-text experiential context. Tests check all six form option
+sets against backend choices. Updated reachable home/features/contact/entry pages and
+legacy prompts: no contact submission service, no permanent library, no independently
+verified facts/standards. Existing unused templates are not evidence of delivered features.
+Remaining Milestone 1 closure work: runtime assets/obsolete-route cleanup, full browser
+walkthrough and export checks, durable idempotency and production session coordination.
+Semantic accuracy and API-enforced schemas remain later milestones.

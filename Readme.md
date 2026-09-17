@@ -4,7 +4,7 @@ LPAPP is a Flask application that uses OpenAI to generate classroom lesson plans
 
 ## Features
 
-- Six lesson-plan formats, including WebQuest/SAMR, concept-based, skills-based, scaffolded reading, and discovery learning
+- Eight studio approaches and six legacy lesson-plan formats, including WebQuest/SAMR, concept-based, skills-based, scaffolded reading, and discovery learning
 - Configurable grade, class size, standards, and learner context
 - Short-answer, fill-in-the-blank, matching, mixed, and multiple-choice worksheets
 - In-memory Word document export
@@ -197,3 +197,10 @@ format checks, not semantic correctness or independent verification.
 
 Invalid legacy lesson/worksheet submissions re-render escaped submitted values and an
 error message, retaining text, selections and checkboxes without changing saved content.
+
+
+Mixed worksheets cycle through short answer, fill-in-the-blank and matching. Each item
+includes a validated subtype; all matching/blank checks apply. The worksheet form now
+exposes Mixed. Double Line Breaks now renders actual blank lines. Legacy select/checkbox
+values are checked against the supported options, with template-parity regression coverage.
+The preview contact page explicitly states it has no messaging service.

@@ -61,3 +61,8 @@ behavior and preservation of inputs and unrelated drafts. No live model calls ar
 
 Type/recovery tests cover valid and broken option labels, duplicate choices, incomplete
 matching maps, true/false formatting, and escaped restoration of text/select/checkbox values.
+
+Mixed worksheet coverage checks per-item subtypes, small counts, malformed blanks, actual
+blank-line delimiters, forged options, and template/backend parity across all six legacy
+lesson forms. These are deterministic tests with mocked AI; they do not measure learning
+outcomes or factual accuracy.

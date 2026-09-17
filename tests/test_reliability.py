@@ -11,7 +11,7 @@ class ReliabilityTests(unittest.TestCase):
     @patch('lesson_planner.generate_text')
     def test_all_six_require_complete_exact_sections(self,mock):
         for preset,sections in lesson_planner.SECTION_ORDER.items():
-            data=dict(SAMPLE_INPUT,prompt=preset,lesson_type='Basic')
+            data=dict(SAMPLE_INPUT,prompt=preset,lesson_type='inquiry_based')
             valid='\n\n'.join(f'Section: {name}\nContent: Material for {name}' for name in sections)
             malformed=[ 'Section: Assessment\nContent: Exit ticket',valid+'\nSection: Assessment\nContent: Duplicate', valid+'\nSection: Surprise\nContent: Unexpected',valid.replace('Content: Material for '+sections[0],'Content: '), 'Prologue\n'+valid,valid.replace('Content:','Body:',1),'',valid.replace('Material for '+sections[0],'<detailed content>')]
             for text in malformed:

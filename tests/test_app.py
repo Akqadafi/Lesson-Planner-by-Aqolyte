@@ -35,7 +35,7 @@ class AppRouteTests(unittest.TestCase):
                 "grade_level": "5",
                 "number_of_students": "25",
                 "culture_group": ["Black", "Latino"],
-                "socioeconomic_level": "Mixed",
+                "socioeconomic_level": "Medium",
                 "experiential_type": "Mixed",
                 "state": "Arizona",
                 "disabled": "True",
