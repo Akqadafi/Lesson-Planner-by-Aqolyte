@@ -17,7 +17,7 @@ from handouts import bp as handouts_blueprint
 from builder import bp as builder_blueprint, csrf
 
 import lesson_planner
-from worksheet_generator import generate_worksheet
+from worksheet_generator import generate_worksheet, WorksheetFormatError
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -292,7 +292,7 @@ def output():
         return render_template("generation_error.html", message=str(exc), previous=False, export_error=True), 503
     except GenerationUnavailableError as exc:
         return render_template("generation_error.html", message=str(exc), previous=bool(session.get("previous_lesson"))), 503
-    except lesson_planner.LessonFormatError as exc:
+    except (lesson_planner.LessonFormatError, WorksheetFormatError) as exc:
         return render_template("generation_error.html", message=str(exc), previous=bool(session.get("previous_lesson"))), 502
     except Exception:
         app.logger.exception("Unable to render generated content")

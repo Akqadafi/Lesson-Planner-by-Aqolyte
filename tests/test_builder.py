@@ -94,7 +94,7 @@ class BuilderTests(unittest.TestCase):
         self.assertIn('Question\nSecond line',text)
         self.post('up',section='assessment')
         self.assertFalse(self.state()['builder_draft']['reviewed'])
-    @patch('worksheet_generator.generate_text',return_value='Questions\nAnswers:\nAnswers')
+    @patch('worksheet_generator.generate_text',return_value=json.dumps({'questions':[{'id':i,'question':'Question','answer':'Answer'} for i in range(1,5)]}))
     def test_real_worksheet_choices(self,mock):
         soup=BeautifulSoup(self.client.get('/worksheet').data,'html.parser')
         for choice in soup.select('[name=question_types] option'):

@@ -97,6 +97,20 @@ def _lesson_blueprint(input_data: dict) -> str:
 
 
 def validate_input(data):
+    if data.get('prompt') not in SECTION_ORDER:
+        raise ValueError('Choose a supported lesson type.')
+    for field in ('topic', 'state', 'socioeconomic_level', 'experiential_type', 'lesson_type'):
+        value = data.get(field, '')
+        if not isinstance(value, str) or len(value) > 300:
+            raise ValueError(f'{field} must be text of at most 300 characters.')
+    if data['prompt'] == 'prompt1' and not data.get('lesson_type', '').strip():
+        raise ValueError('Choose a lesson approach.')
+    groups = data.get('culture_group') or []
+    if isinstance(groups, str):
+        groups = [groups]
+    if not isinstance(groups, list) or len(groups) > 20 or any(not isinstance(v, str) or not v.strip() or len(v) > 100 for v in groups):
+        raise ValueError('Use at most 20 context entries of 1-100 characters.')
+
     for name, low, high in [('grade_level', 0, 12), ('number_of_students', 1, 100), ('number_of_words', 50, 5000)]:
         try:
             value = int(data.get(name, ''))

@@ -54,3 +54,7 @@ missing, wrong, and other-session tokens preserve saved state and cannot call ge
 September 17 coverage adds concurrent quota reservations, fixed-window resets, failed
 attempt accounting, fail-closed configuration, pre-provider input rejection, and incomplete
 output rejection. Counter tests use temporary databases; provider calls are mocked.
+
+Worksheet contract tests reject missing/extra items, duplicate or noninteger IDs, missing
+and empty answers, oversized fields, and malformed JSON. Route coverage verifies retry
+behavior and preservation of inputs and unrelated drafts. No live model calls are made.

@@ -30,3 +30,11 @@ retries are disabled. Added aggregate request-size bounds and rejection of incom
 empty, malformed or oversized provider text. Quotas do not establish dollar budgets,
 distributed-host protection, or durable request idempotency. Legacy worksheet structure
 and broader field/enum audits remain open.
+
+## September 17 worksheet contract increment
+
+Closed the basic legacy worksheet completeness gap: exact item count, consecutive integer
+IDs, bounded/nonempty questions and answers, no unexpected fields, and explicit malformed
+output recovery. Added legacy lesson context text/list validation before AI calls.
+Still pending: type-specific checks (e.g. four multiple-choice options), factual/answer
+verification, enum audit, complete form-value recovery, and API-enforced schemas.

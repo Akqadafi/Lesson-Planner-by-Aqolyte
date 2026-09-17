@@ -1,4 +1,9 @@
+import json
 from openai_service import generate_text
+
+
+class WorksheetFormatError(ValueError):
+    pass
 
 
 QUESTION_PROMPTS = {
@@ -40,14 +45,35 @@ def generate_worksheet(topic, num_questions, question_type, formatting_delimiter
 Create a worksheet draft about {topic} with exactly {num_questions} questions for grade {grade_level} (0 means kindergarten).
 This is an unverified teacher draft. Do not invent citations. Flag uncertain facts for review.
 {question_instruction}
-List all questions first, followed by a section titled exactly "Answers:" containing the answer key.
-Place this delimiter between items: {delimiter}
-Do not include commentary before or after the worksheet.
+Return only JSON with a questions array. Each item must have exactly these fields:
+id (consecutive integer starting at 1), question (nonempty student-facing text),
+answer (nonempty teacher answer or scoring guidance). Include exactly {num_questions} items.
+Include all choices or matching columns inside question where needed. Never put teacher answers in question.
 """.strip()
 
-    return generate_text(
+    raw = generate_text(
         [
             {"role": "system", "content": "You create accurate, age-appropriate classroom worksheets."},
             {"role": "user", "content": prompt},
         ]
     )
+
+    try:
+        payload = json.loads(raw)
+        if not isinstance(payload, dict) or set(payload) != {'questions'}:
+            raise ValueError()
+        rows = payload['questions']
+        if not isinstance(rows, list) or len(rows) != num_questions:
+            raise ValueError()
+        for index, row in enumerate(rows, 1):
+            if not isinstance(row, dict) or set(row) != {'id', 'question', 'answer'}:
+                raise ValueError()
+            if type(row['id']) is not int or row['id'] != index:
+                raise ValueError()
+            if any(not isinstance(row[key], str) or not row[key].strip() or len(row[key]) > 4000 for key in ('question', 'answer')):
+                raise ValueError()
+        questions = ('\n' + delimiter + '\n').join(f"{r['id']}. {r['question'].strip()}" for r in rows)
+        answers = ('\n' + delimiter + '\n').join(f"{r['id']}. {r['answer'].strip()}" for r in rows)
+        return questions + '\n\nAnswers:\n' + answers
+    except (ValueError, TypeError, KeyError):
+        raise WorksheetFormatError('The worksheet did not contain the requested questions and matching answers. Your inputs are saved; please retry.') from None

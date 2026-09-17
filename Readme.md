@@ -175,3 +175,13 @@ Requests exceeding 150,000 content characters are rejected before reserving an a
 Only completed provider responses with nonempty text of at most 200,000 characters are
 accepted. Existing 12,000 output-token cap still applies. These structural checks do not
 verify factual accuracy or establish legacy worksheet question/answer completeness.
+
+## Legacy worksheet completeness
+
+Legacy worksheet generation now requests JSON records with consecutive integer IDs and
+nonempty question/answer fields. The app checks the exact requested count, fields, IDs,
+and 4,000-character per-field limits before rendering the existing numbered worksheet
+and answer-key view. Invalid output returns a retry page without saving partial content;
+inputs and the separate modular draft remain intact. This is application-side validation,
+not API-enforced Structured Outputs, factual verification, or proof of answer correctness.
+Legacy lesson context fields now have type/length bounds and cultural-context list limits.
