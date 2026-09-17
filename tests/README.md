@@ -45,3 +45,8 @@ Added regression cases for atomic rejected saves, concurrent same-session genera
 requests, safe health/version responses, and malformed worksheet delimiters. These tests
 mock AI calls; the concurrency test uses separate clients sharing a session and coordinates
 an in-flight model response with threading events.
+
+
+Legacy generation now requires an explicit CSRF-protected POST; GET /output never calls AI.
+Reset is POST-only. Tests submit tokens from rendered forms and separately verify that
+missing, wrong, and other-session tokens preserve saved state and cannot call generation.

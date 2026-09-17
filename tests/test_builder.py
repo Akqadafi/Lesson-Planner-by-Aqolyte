@@ -1,3 +1,4 @@
+from form_client import client as form_client
 import json
 import os
 import unittest
@@ -13,7 +14,7 @@ from docx import Document
 class BuilderTests(unittest.TestCase):
     def setUp(self):
         app.app.config.update(TESTING=True)
-        self.client=app.app.test_client()
+        self.client=form_client(app.app)
         self.client.get('/builder/')
     def state(self):
         with self.client.session_transaction() as s:
@@ -98,6 +99,7 @@ class BuilderTests(unittest.TestCase):
         soup=BeautifulSoup(self.client.get('/worksheet').data,'html.parser')
         for choice in soup.select('[name=question_types] option'):
             response=self.client.post('/worksheet',data={'topic':'Fractions','grade_level':'4','num_questions':'4','question_types':choice['value']},follow_redirects=True)
+            response=self.client.post('/output',data={'generate':'1'},follow_redirects=True)
             self.assertEqual(response.status_code,200,choice['value'])
         self.assertIn('grade 4',mock.call_args.args[0][1]['content'])
     def test_legacy_invalid_numbers_rejected(self):

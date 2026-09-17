@@ -1,3 +1,4 @@
+from form_client import client as form_client
 import os
 import subprocess
 import unittest

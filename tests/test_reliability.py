@@ -1,3 +1,4 @@
+from form_client import client as form_client
 import unittest
 from io import BytesIO
 from unittest.mock import patch
@@ -23,13 +24,14 @@ class ReliabilityTests(unittest.TestCase):
             self.assertEqual(list(result),sections)
     @patch('lesson_planner.generate_text',return_value='Section: Assessment\nContent: incomplete')
     def test_failure_preserves_inputs_and_previous_draft(self,mock):
-        client=app.app.test_client()
+        client=form_client(app.app)
         with client.session_transaction() as s:
             s['prompt']='prompt3'
             s['content_type']='Lesson Plan'
             s['content']={'Title':'Previous lesson'}
             s['input_data']=dict(SAMPLE_INPUT)
-        response=client.post('/home',data=SAMPLE_INPUT,follow_redirects=True)
+        client.post('/home',data=SAMPLE_INPUT,follow_redirects=True)
+        response=client.post('/output',data={'generate':'1'},follow_redirects=True)
         self.assertEqual(response.status_code,502)
         with client.session_transaction() as s:
             self.assertEqual(s['input_data']['topic'],SAMPLE_INPUT['topic'])

@@ -13,11 +13,11 @@ Scope: current local feature branch; no paid API calls or production deployment.
 
 ## Remaining findings / priority
 
-1. Legacy POST routes still lack consistent CSRF validation. /clear_cache mutates state on GET. /output can trigger paid generation on GET. Migrate to explicit protected POST operations and update forms/recovery flows and route tests together.
+1. CLOSED: Legacy POST routes now require session CSRF tokens. /clear_cache accepts POST only. /output GET displays saved content or a generation confirmation; only an explicit protected generate POST may call AI. Successful generation redirects to GET. Rendered forms and recovery/download submissions carry tokens.
 2. Shared session concurrency protection is required before multi-worker deployment. Current process-local guard deliberately returns retry responses rather than queuing stale requests. A rejected racing edit is not saved; reload after the current request finishes.
 3. Per-visitor quotas, burst limits, global budgets and request idempotency remain absent. Cookie-based session serialization is not abuse protection.
 4. Legacy worksheet output remains free text without structural question/answer completeness validation. API-enforced schemas remain pending.
 5. Complete legacy field/enum limits, saved-input recovery, response-size limits, and visible claims audit. Existing strict section-count checks do not establish factual accuracy.
 6. Durable plan storage, standards verification and quality evaluation remain separate later milestones.
 
-Next increment: eliminate state-changing GETs and add consistent legacy CSRF with rendered-form tests. Do not mark Milestone 1 complete yet.
+Next increment: generation quotas/idempotency and broader legacy validation/output contracts. Do not mark Milestone 1 complete yet.

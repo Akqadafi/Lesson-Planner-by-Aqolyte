@@ -4,7 +4,7 @@
 <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="text-center w-50">
         <h2>Reading Lesson Plan</h2>
-        <form method="POST">
+        <form method="POST"><input type="hidden" name="csrf" value="{{ csrf_token() }}">
             <input type="hidden" name="prompt" value="{{ prompt }}">
             <div class="form-group">
                 <label for="topic">Topic:</label>

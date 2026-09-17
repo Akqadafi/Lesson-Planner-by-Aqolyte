@@ -4,7 +4,7 @@
 <div class="container d-flex align-items-center justify-content-center min-vh-100">
     <div class="text-center w-50">
         <h2>Create a Worksheet</h2><p>Generated answers need teacher review before classroom use.</p><a href="/builder/">Back to lesson studio</a>
-        <form method="POST">
+        <form method="POST"><input type="hidden" name="csrf" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="topic">Topic:</label>
                 <input type="text" class="form-control" id="topic" name="topic" required>

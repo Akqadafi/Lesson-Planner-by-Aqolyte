@@ -1,4 +1,5 @@
 import logging
+import secrets
 import os
 from io import BytesIO
 from pdf_export import convert_docx, PDFExportError
@@ -13,7 +14,7 @@ from request_guard import SessionRequestGuard
 
 from openai_service import GenerationUnavailableError
 from handouts import bp as handouts_blueprint
-from builder import bp as builder_blueprint
+from builder import bp as builder_blueprint, csrf
 
 import lesson_planner
 from worksheet_generator import generate_worksheet
@@ -47,6 +48,20 @@ Session(app)
 app.wsgi_app = SessionRequestGuard(app.wsgi_app, app.config["SESSION_COOKIE_NAME"])
 app.register_blueprint(builder_blueprint)
 app.register_blueprint(handouts_blueprint)
+
+
+@app.context_processor
+def csrf_context():
+    return {"csrf_token": csrf}
+
+
+@app.before_request
+def protect_legacy_forms():
+    if request.method == "POST" and request.blueprint not in {"builder", "handouts"}:
+        expected = session.get("builder_csrf", "")
+        supplied = request.form.get("csrf", "")
+        if not expected or not secrets.compare_digest(expected.encode(), supplied.encode()):
+            return "This form expired. Reload the form and try again. Your saved work is unchanged.", 400
 
 
 def clear_generation_session():
@@ -110,7 +125,7 @@ def choose():
     return render_template("choose.html")
 
 
-@app.route("/clear_cache")
+@app.route("/clear_cache", methods=["POST"])
 def clear_cache():
     session.clear()
     return redirect(url_for("landing"))
@@ -246,6 +261,11 @@ def output():
         if saved:
             return saved
 
+        if request.method == "GET":
+            return render_template("generation_ready.html")
+        if request.form.get("generate") != "1":
+            return "Choose an explicit generation or download action.", 400
+
         input_data = session.get("input_data")
         worksheet_data = session.get("worksheet_data")
 
@@ -253,7 +273,7 @@ def output():
             lesson_plan, _ordered_sections = lesson_planner.generate_lesson_plan(input_data)
             session["content_type"] = "Lesson Plan"
             session["content"] = lesson_plan
-            return _render_saved_content()
+            return redirect(url_for("output"))
 
         if worksheet_data:
             generated = generate_worksheet(
@@ -265,7 +285,7 @@ def output():
             )
             session["content_type"] = "Worksheet"
             session["content"] = generated
-            return _render_saved_content()
+            return redirect(url_for("output"))
 
         return "No data found. Please return to the home page and try again.", 400
     except PDFExportError as exc:

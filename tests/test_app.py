@@ -1,3 +1,4 @@
+from form_client import client as form_client
 import os
 import unittest
 from unittest.mock import patch
@@ -12,7 +13,7 @@ import app as app_module
 class AppRouteTests(unittest.TestCase):
     def setUp(self):
         app_module.app.config.update(TESTING=True)
-        self.client = app_module.app.test_client()
+        self.client = form_client(app_module.app)
 
     def test_landing_and_products_templates_resolve(self):
         self.assertEqual(self.client.get("/").status_code, 200)
@@ -53,7 +54,7 @@ class AppRouteTests(unittest.TestCase):
         with self.client.session_transaction() as browser_session:
             browser_session["input_data"] = {"grade_level": "5"}
 
-        first = self.client.get("/output")
+        first = self.client.post("/output", data={"generate":"1"}, follow_redirects=True)
         second = self.client.get("/output")
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 200)

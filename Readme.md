@@ -148,3 +148,8 @@ locking, rate limiting, or durable idempotency. Production requires shared coord
 `SESSION_COOKIE_SECURE=true` enables HTTPS-only cookies on a TLS deployment; leave it off
 for the local HTTP preview. `/health` reports process responsiveness; `/version` reports
 the application version. See RELIABILITY-AUDIT.md for remaining release blockers.
+
+
+Legacy generation now requires an explicit CSRF-protected POST; GET /output never calls AI.
+Reset is POST-only. Tests submit tokens from rendered forms and separately verify that
+missing, wrong, and other-session tokens preserve saved state and cannot call generation.

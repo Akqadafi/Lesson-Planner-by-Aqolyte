@@ -1,3 +1,4 @@
+from form_client import client as form_client
 import os
 import json
 import unittest
@@ -12,7 +13,7 @@ from handouts import fingerprint
 class HandoutTests(unittest.TestCase):
     def setUp(self):
         app.app.config['TESTING']=True
-        self.client=app.app.test_client();self.client.get('/builder/')
+        self.client=form_client(app.app);self.client.get('/builder/')
         with self.client.session_transaction() as s:
             s['builder_draft']={'config':{'topic':'Fractions','grade':5,'objectives':'Compare fractions','sources':'Teacher excerpt'},
                 'sections':[{'id':'activities','content':'Compare one half and two thirds'}],'revision':'initial','reviewed':False}

@@ -1,3 +1,4 @@
+from form_client import client as form_client
 import copy
 import json
 import threading
@@ -27,7 +28,7 @@ class ReliabilityAuditTests(unittest.TestCase):
         state = self.state()
         data = {'action': 'generate', 'csrf': state['builder_csrf'], 'revision': state['builder_draft']['revision']}
         entered, release = threading.Event(), threading.Event()
-        other = app.app.test_client()
+        other = form_client(app.app)
         cookie = self.client.get_cookie(app.app.config['SESSION_COOKIE_NAME'])
         other.set_cookie(app.app.config['SESSION_COOKIE_NAME'], cookie.value)
         def generate(*args, **kwargs):
@@ -43,7 +44,7 @@ class ReliabilityAuditTests(unittest.TestCase):
                 self.assertEqual(other.post('/builder/', data={**data, 'action': 'save', 'content_worksheet': 'Racing edit'}).status_code, 409)
                 self.assertEqual(other.get('/builder/').status_code, 409)
                 # Another visitor is not serialized behind this session.
-                visitor = app.app.test_client()
+                visitor = form_client(app.app)
                 self.assertEqual(visitor.get('/health').status_code, 200)
             finally:
                 release.set()
