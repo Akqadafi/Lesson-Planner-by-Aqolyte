@@ -6,7 +6,6 @@ from pdf_export import convert_docx, PDFExportError
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from docx import Document
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, send_file, session, url_for
 from flask_session import Session

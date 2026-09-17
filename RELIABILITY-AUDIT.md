@@ -59,3 +59,16 @@ verified facts/standards. Existing unused templates are not evidence of delivere
 Remaining Milestone 1 closure work: runtime assets/obsolete-route cleanup, full browser
 walkthrough and export checks, durable idempotency and production session coordination.
 Semantic accuracy and API-enforced schemas remain later milestones.
+
+## Workflow review and cleanup
+
+Added an end-to-end HTTP workflow test using tokens/revisions read from rendered forms:
+manual outline, edit, review, lesson Word export, handout creation/edit, separate student
+and teacher exports, source-change export block, acknowledgement, and successful re-export.
+No AI calls occur. Added navigation/local-asset coverage across ten entry pages; fixed the
+missing favicon reference by using the existing logo. Removed an unused document import.
+Unreferenced historical text/template artifacts were identified but retained pending a
+repository archive decision; no user-authored historical content was deleted.
+This is HTTP/document-content verification, not a visual browser or live-model evaluation.
+Remaining release work: visual/mobile/accessibility walkthrough, production session
+coordination and idempotency, and GitHub/CI. Do not claim Milestone 1 is fully closed.
