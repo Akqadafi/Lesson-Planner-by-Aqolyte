@@ -73,6 +73,15 @@ This is HTTP/document-content verification, not a visual browser or live-model e
 Remaining release work: visual/mobile/accessibility walkthrough, production session
 coordination and idempotency, and GitHub/CI. Do not claim Milestone 1 is fully closed.
 
+## Continuous integration — September 17
+
+Added a GitHub Actions workflow that runs the complete offline unittest suite on pull
+requests and pushes to `main` or `codex/modular-lesson-builder`. It uses read-only
+repository permissions, placeholder credentials, Python 3.12, cached dependencies, a
+15-minute timeout, and cancellation of superseded runs. It does not call the OpenAI API,
+perform real PDF conversion, publish an image, or deploy the app. The complete local suite
+passed 75 tests before the workflow was committed.
+
 ## Browser/mobile review — September 17
 
 Inspected the existing lesson editor at desktop/default and 390x844 viewport sizes,

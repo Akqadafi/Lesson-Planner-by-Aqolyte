@@ -41,6 +41,12 @@ Tests mock the OpenAI boundary and do not make network requests:
 python -m unittest discover -s tests -v
 ```
 
+GitHub Actions runs the same offline suite on pull requests and pushes to `main` or
+`codex/modular-lesson-builder`. The workflow supplies placeholders rather than real API
+credentials, grants read-only repository access, cancels superseded runs, and does not
+deploy the application. PDF route tests mock conversion; production converter checks remain
+separate from CI.
+
 ## Security
 
 Never commit `.env`, API keys, generated logs, or user data. See [SECURITY.md](SECURITY.md) for credential-rotation guidance.
