@@ -153,3 +153,25 @@ the application version. See RELIABILITY-AUDIT.md for remaining release blockers
 Legacy generation now requires an explicit CSRF-protected POST; GET /output never calls AI.
 Reset is POST-only. Tests submit tokens from rendered forms and separately verify that
 missing, wrong, and other-session tokens preserve saved state and cannot call generation.
+
+## Generation limits and boundary validation
+
+All real AI requests reserve an attempt in SQLite before contacting the provider.
+Defaults: 10 attempts per browser session per fixed UTC hour and 100 attempts across
+this app per UTC day. Configure GENERATION_SESSION_HOURLY and GENERATION_GLOBAL_DAILY
+with positive integers. Failures count because a failed response may still incur cost.
+Automatic SDK retries are disabled so one reservation cannot silently send a second
+request. Editing, manual handout creation and exports do not consume attempts.
+
+The default counter database is instance/generation-limits.sqlite3. Processes sharing
+that local database use atomic transactions; configure GENERATION_LIMIT_DB to place it
+on persistent local storage. This does not solve session-write coordination. Separate
+hosts/databases have separate quotas; do not deploy this as a distributed budget system.
+Cookie clearing can reset the visitor identity, but cannot reset the shared daily count.
+These are attempt caps, not dollar spending limits or comprehensive abuse protection.
+Invalid settings or an unavailable counter database pause generation safely.
+
+Requests exceeding 150,000 content characters are rejected before reserving an attempt.
+Only completed provider responses with nonempty text of at most 200,000 characters are
+accepted. Existing 12,000 output-token cap still applies. These structural checks do not
+verify factual accuracy or establish legacy worksheet question/answer completeness.

@@ -4,16 +4,17 @@ import httpx
 from openai import RateLimitError, APIConnectionError
 from openai_service import generate_text, GenerationUnavailableError
 
+@patch("openai_service.reserve_attempt")
 class ServiceErrorTests(unittest.TestCase):
     @patch('openai_service.get_client')
-    def test_credit_error_safe_and_actionable(self,client):
+    def test_credit_error_safe_and_actionable(self,client,reserve):
         response=httpx.Response(429,request=httpx.Request('POST','https://api.openai.com/v1/responses'))
         client.return_value.responses.create.side_effect=RateLimitError('private provider payload',response=response,body={'code':'credit_balance_exhausted'})
-        with self.assertRaises(GenerationUnavailableError) as error:generate_text([])
+        with self.assertRaises(GenerationUnavailableError) as error:generate_text([{'role':'user','content':'Test'}])
         self.assertIn('API credits or quota are exhausted',str(error.exception))
         self.assertNotIn('private provider payload',str(error.exception))
     @patch('openai_service.get_client')
-    def test_network_error_actionable(self,client):
+    def test_network_error_actionable(self,client,reserve):
         client.return_value.responses.create.side_effect=APIConnectionError(request=httpx.Request('POST','https://api.openai.com/v1/responses'))
-        with self.assertRaises(GenerationUnavailableError) as error:generate_text([])
+        with self.assertRaises(GenerationUnavailableError) as error:generate_text([{'role':'user','content':'Test'}])
         self.assertIn('server',str(error.exception))

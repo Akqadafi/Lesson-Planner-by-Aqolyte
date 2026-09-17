@@ -21,3 +21,12 @@ Scope: current local feature branch; no paid API calls or production deployment.
 6. Durable plan storage, standards verification and quality evaluation remain separate later milestones.
 
 Next increment: generation quotas/idempotency and broader legacy validation/output contracts. Do not mark Milestone 1 complete yet.
+
+## September 17 increment
+
+Added shared-entry-point generation attempt limits using local SQLite transactions,
+per-session hourly and app-wide daily windows. Failed attempts count; automatic SDK
+retries are disabled. Added aggregate request-size bounds and rejection of incomplete,
+empty, malformed or oversized provider text. Quotas do not establish dollar budgets,
+distributed-host protection, or durable request idempotency. Legacy worksheet structure
+and broader field/enum audits remain open.

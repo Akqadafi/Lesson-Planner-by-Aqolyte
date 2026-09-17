@@ -50,3 +50,7 @@ an in-flight model response with threading events.
 Legacy generation now requires an explicit CSRF-protected POST; GET /output never calls AI.
 Reset is POST-only. Tests submit tokens from rendered forms and separately verify that
 missing, wrong, and other-session tokens preserve saved state and cannot call generation.
+
+September 17 coverage adds concurrent quota reservations, fixed-window resets, failed
+attempt accounting, fail-closed configuration, pre-provider input rejection, and incomplete
+output rejection. Counter tests use temporary databases; provider calls are mocked.
