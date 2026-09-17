@@ -16,6 +16,9 @@ class SessionRequestGuard:
         self.locks = [threading.Lock() for _ in range(stripes)]
 
     def __call__(self, environ, start_response):
+        # Static files do not read or mutate draft state. Let browser assets load together.
+        if environ.get('REQUEST_METHOD') in {'GET', 'HEAD'} and environ.get('PATH_INFO', '').startswith('/static/'):
+            return self.application(environ, start_response)
         cookies = SimpleCookie()
         try:
             cookies.load(environ.get('HTTP_COOKIE', ''))

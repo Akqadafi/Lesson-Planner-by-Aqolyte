@@ -43,6 +43,9 @@ class ReliabilityAuditTests(unittest.TestCase):
                 self.assertEqual(other.post('/builder/', data=data).status_code, 409)
                 self.assertEqual(other.post('/builder/', data={**data, 'action': 'save', 'content_worksheet': 'Racing edit'}).status_code, 409)
                 self.assertEqual(other.get('/builder/').status_code, 409)
+                with other.get('/static/css/builder.css') as asset:
+                    self.assertEqual(asset.status_code, 200)
+                    self.assertIn(b'box-sizing', asset.data)
                 # Another visitor is not serialized behind this session.
                 visitor = form_client(app.app)
                 self.assertEqual(visitor.get('/health').status_code, 200)

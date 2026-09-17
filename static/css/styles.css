@@ -230,3 +230,12 @@ p.lead {
     background-color: #f8f9fa;
     padding: 1rem 0;
 }
+
+/* Legacy forms need the full available width on phones. */
+@media (max-width: 700px) {
+    main .container > .w-50 { width: 100% !important; padding: 20px 4px; }
+    main input:not([type=checkbox]):not([type=radio]):not([type=hidden]),
+    main select, main textarea { width: 100%; min-height: 44px; font-size: 16px; }
+    main button, main .btn { min-height: 44px; }
+    main label { margin-top: 8px; }
+}

@@ -72,3 +72,16 @@ repository archive decision; no user-authored historical content was deleted.
 This is HTTP/document-content verification, not a visual browser or live-model evaluation.
 Remaining release work: visual/mobile/accessibility walkthrough, production session
 coordination and idempotency, and GitHub/CI. Do not claim Milestone 1 is fully closed.
+
+## Browser/mobile review — September 17
+
+Inspected the existing lesson editor at desktop/default and 390x844 viewport sizes,
+plus worksheet and handout setup at mobile width. Did not alter the user's draft or
+call AI. Fixed legacy half-width mobile forms, enlarged mobile controls, and exempted
+static GET/HEAD requests from session serialization so concurrent stylesheet/script/image
+loads cannot receive busy responses. A regression test verifies static loading while a
+generation request holds the session lock; all four targeted audit tests passed.
+After restart, visually verified the wider worksheet and restored logo and inspected
+handout setup. Reset viewport to normal. This is a focused visual review, not a full
+accessibility certification or all-device test; keyboard/screen-reader and long-content
+edge cases remain for broader usability testing.
