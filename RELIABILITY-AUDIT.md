@@ -80,7 +80,8 @@ requests and pushes to `main` or `codex/modular-lesson-builder`. It uses read-on
 repository permissions, placeholder credentials, Python 3.12, cached dependencies, a
 15-minute timeout, and cancellation of superseded runs. It does not call the OpenAI API,
 perform real PDF conversion, publish an image, or deploy the app. The complete local suite
-passed 75 tests before the workflow was committed.
+passed 75 tests before the workflow was committed. The feature branch was published to
+GitHub and workflow run 35280916412 completed successfully against commit `75f8486`.
 
 ## Browser/mobile review — September 17
 
