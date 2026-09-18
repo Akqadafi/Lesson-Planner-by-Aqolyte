@@ -47,6 +47,15 @@ credentials, grants read-only repository access, cancels superseded runs, and do
 deploy the application. PDF route tests mock conversion; production converter checks remain
 separate from CI.
 
+## Releases and recovery
+
+The application follows semantic versioning. `VERSION` is the single application version,
+`CHANGELOG.md` records user-visible changes, and annotated Git tags preserve release
+snapshots. See [docs/VERSIONING.md](docs/VERSIONING.md) for the release checklist and
+safe rollback procedures. Committed code and release tags are backed up to GitHub; ignored
+runtime files such as `.env`, session data, and quota databases require a separate encrypted
+backup when they become operationally important.
+
 ## Security
 
 Never commit `.env`, API keys, generated logs, or user data. See [SECURITY.md](SECURITY.md) for credential-rotation guidance.

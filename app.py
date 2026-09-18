@@ -20,6 +20,7 @@ from worksheet_generator import generate_worksheet, WorksheetFormatError
 
 
 BASE_DIR = Path(__file__).resolve().parent
+APP_VERSION = (BASE_DIR / "VERSION").read_text(encoding="utf-8").strip()
 load_dotenv(BASE_DIR / ".env")
 
 logging.basicConfig(
@@ -122,7 +123,7 @@ def health():
 
 @app.get("/version")
 def version():
-    return {"app": "LPAPP", "version": "0.2.0"}
+    return {"app": "LPAPP", "version": APP_VERSION}
 
 
 @app.route("/")

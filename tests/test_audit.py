@@ -59,7 +59,7 @@ class ReliabilityAuditTests(unittest.TestCase):
 
     def test_metadata_contains_no_configuration(self):
         self.assertEqual(self.client.get('/health').json, {'status': 'ok'})
-        self.assertEqual(set(self.client.get('/version').json), {'app', 'version'})
+        self.assertEqual(self.client.get('/version').json, {'app': 'LPAPP', 'version': '0.2.0'})
 
     @patch('worksheet_generator.generate_text')
     def test_invalid_delimiter_never_calls_model(self, model):
@@ -68,4 +68,3 @@ class ReliabilityAuditTests(unittest.TestCase):
                 generate_worksheet('Fractions', 3, 'essay', delimiter)
             self.assertEqual(self.client.post('/worksheet', data={'topic': 'Fractions', 'num_questions': '3', 'question_types': 'essay', 'delimiter': delimiter}).status_code, 400)
         model.assert_not_called()
-
