@@ -5,6 +5,11 @@ All notable changes to LPAPP are recorded here. The project uses
 
 ## [Unreleased]
 
+### Changed
+
+- Reframed the experimental homepage around Aqolyte LLC as the parent company for web,
+  educational, and applied AI tools, with Lesson Planner presented as its first product
+
 ### Planned
 
 - Persistent teacher accounts and saved lesson libraries

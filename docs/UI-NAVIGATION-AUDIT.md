@@ -71,3 +71,15 @@ welcoming and gives first-time visitors less explanation.
 Choose one preview after checking desktop and mobile. Then replace the current homepage and shared
 navigation, redirect or retire the redundant public routes, update route-inventory tests, and run
 the full offline suite. The preview routes make no AI calls and do not alter saved drafts.
+
+## Corporate homepage direction
+
+The company and product layers are now treated separately on the experiment branch. `/` is an
+Aqolyte LLC corporate homepage for its web, educational, and applied AI work. Lesson Planner is
+presented as the first product and links into the existing application. The recommended Teacher
+Workspace preview remains the proposed application dashboard, rather than the corporate home.
+
+The next company-site pages are About, Products, a dedicated Lesson Planner product page, and
+Contact. These should reuse the corporate header and footer. After those are complete, the
+Lesson Planner should receive its own app shell and dashboard without duplicating the company
+marketing navigation.

@@ -33,7 +33,7 @@ class SurfaceAuditTests(unittest.TestCase):
         }
         self.assertEqual(templates, expected_templates)
         static = {path.relative_to(root/'static').as_posix() for path in (root/'static').rglob('*') if path.is_file()}
-        self.assertEqual(static, {'builder.js','css/builder.css','css/design-options.css','css/styles.css','img/logo.png','img/logo2.png'})
+        self.assertEqual(static, {'builder.js','css/builder.css','css/corporate.css','css/design-options.css','css/styles.css','img/logo.png','img/logo2.png'})
 
     def test_ui_previews_are_safe_and_link_to_real_tools(self):
         client = app.app.test_client()
@@ -46,3 +46,11 @@ class SurfaceAuditTests(unittest.TestCase):
             self.assertIn(b'/builder/', response.data)
             self.assertIn(b'/worksheet', response.data)
         self.assertEqual(client.get('/design-options/unknown').status_code, 404)
+
+    def test_corporate_home_explains_company_and_first_product(self):
+        response = app.app.test_client().get('/')
+        self.assertEqual(response.status_code, 200)
+        for text in (b'Aqolyte LLC', b'Web products', b'Education tools', b'Applied AI', b'Aqolyte Lesson Planner'):
+            self.assertIn(text, response.data)
+        for destination in (b'href="/about"', b'href="/products"', b'href="/contact"', b'href="/builder/"'):
+            self.assertIn(destination, response.data)
