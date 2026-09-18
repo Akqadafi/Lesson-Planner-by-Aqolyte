@@ -156,6 +156,35 @@ def contact():
     return render_template("contact.html")
 
 
+DESIGN_OPTIONS = {
+    "workspace": "Teacher workspace",
+    "guided": "Guided journey",
+    "studio": "Studio first",
+}
+
+
+@app.route("/design-options/")
+def design_options():
+    return render_template(
+        "design_options.html",
+        current=None,
+        options=DESIGN_OPTIONS,
+        has_draft=bool(session.get("builder_draft")),
+    )
+
+
+@app.route("/design-options/<option>")
+def design_option(option):
+    if option not in DESIGN_OPTIONS:
+        return "Design option not found.", 404
+    return render_template(
+        "design_options.html",
+        current=option,
+        options=DESIGN_OPTIONS,
+        has_draft=bool(session.get("builder_draft")),
+    )
+
+
 @app.route("/choose")
 def choose():
     return render_template("choose.html")

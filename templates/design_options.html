@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% if current %}{{ options[current] }} preview{% else %}Homepage design options{% endif %} · Aqolyte</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/design-options.css') }}">
+</head>
+<body class="{% if current %}option-{{ current }}{% else %}option-index{% endif %}">
+  <nav class="preview-bar" aria-label="Design preview navigation">
+    <a href="/design-options/" class="preview-title">UI OPTIONS</a>
+    <div>
+      {% for key, label in options.items() %}
+      <a href="/design-options/{{ key }}" {% if current == key %}aria-current="page"{% endif %}>{{ loop.index }}. {{ label }}</a>
+      {% endfor %}
+      <a href="/">Current home</a>
+    </div>
+  </nav>
+
+  {% if not current %}
+  <main class="comparison-shell">
+    <p class="kicker">AQOLYTE INTERFACE STUDY · v0.2.1 BASELINE</p>
+    <h1>Choose the clearest way into the work.</h1>
+    <p class="comparison-intro">These previews change only the homepage and navigation concept. The released planner, worksheets, handouts, generation safeguards, and exports remain untouched.</p>
+    <section class="audit-summary" aria-labelledby="audit-title">
+      <div><p class="number">01</p><h2 id="audit-title">What needs repair</h2></div>
+      <ul>
+        <li>Two unrelated visual systems split the marketing pages from the lesson workspace.</li>
+        <li>Home, About, Products, Features, Contact, and a second landing page create too many shallow stops.</li>
+        <li>The main action competes with an older lesson-versus-worksheet path.</li>
+        <li>The mobile menu disappears and homepage copy overflows the viewport.</li>
+      </ul>
+    </section>
+    <section class="option-cards" aria-label="Homepage concepts">
+      <a class="option-card recommended" href="/design-options/workspace">
+        <span>OPTION 01 · RECOMMENDED</span><h2>Teacher workspace</h2>
+        <p>Lead with the tasks teachers came to complete and show what is available now.</p>
+        <strong>Best balance of clarity and product identity →</strong>
+      </a>
+      <a class="option-card" href="/design-options/guided">
+        <span>OPTION 02</span><h2>Guided journey</h2>
+        <p>Explain the workflow first and move new users through a simple sequence.</p>
+        <strong>Best for first-time visitors →</strong>
+      </a>
+      <a class="option-card" href="/design-options/studio">
+        <span>OPTION 03</span><h2>Studio first</h2>
+        <p>Open directly into a compact tool dashboard with almost no marketing layer.</p>
+        <strong>Best for frequent users →</strong>
+      </a>
+    </section>
+  </main>
+
+  {% elif current == 'workspace' %}
+  <header class="site-header shell">
+    <a class="brand" href="/design-options/workspace"><span>A</span>AQOLYTE</a>
+    <nav aria-label="Primary navigation"><a aria-current="page" href="/builder/">Plan a lesson</a><a href="{% if has_draft %}/handouts/{% else %}/builder/{% endif %}">Student materials</a><a href="/worksheet">Quick worksheet</a><a href="#how">How it works</a></nav>
+  </header>
+  <main>
+    <section class="workspace-hero shell">
+      <div><p class="kicker">TEACHER WORKSPACE</p><h1>What are you planning today?</h1><p class="lede">Build a lesson, shape the materials students receive, and keep your review in control from first draft to export.</p><div class="hero-actions"><a class="button primary" href="/builder/">Start a lesson</a><a class="text-link" href="#actions">See every tool ↓</a></div></div>
+      <aside class="workspace-status"><p class="kicker">YOUR WORKSPACE</p><h2>{% if has_draft %}A saved lesson is ready{% else %}Start with a lesson outline{% endif %}</h2><p>{% if has_draft %}Continue editing your current session draft or create aligned student materials.{% else %}Choose a preset, adapt a structure, or assemble only the sections you need.{% endif %}</p><a href="/builder/">{% if has_draft %}Continue current lesson{% else %}Open lesson studio{% endif %} →</a><small>Stored in this browser session</small></aside>
+    </section>
+    <section class="task-section shell" id="actions"><div class="section-heading"><p class="kicker">START WITH A TASK</p><h2>One workspace, three clear paths.</h2></div><div class="task-grid">
+      <a href="/builder/"><span>01</span><h3>Plan a lesson</h3><p>Use a preset, customize its modules, or build from scratch.</p><strong>Open the studio →</strong></a>
+      <a href="{% if has_draft %}/handouts/{% else %}/builder/{% endif %}"><span>02</span><h3>Create student materials</h3><p>Turn saved lesson sections into handouts and teacher keys.</p><strong>{% if has_draft %}Open materials{% else %}Begin with a lesson{% endif %} →</strong></a>
+      <a href="/worksheet"><span>03</span><h3>Make a quick worksheet</h3><p>Create a standalone practice set when a full lesson is unnecessary.</p><strong>Open quick worksheet →</strong></a>
+    </div></section>
+    <section class="how-section shell" id="how"><p class="kicker">HOW IT WORKS</p><ol><li><span>01</span><div><h3>Add context</h3><p>Set goals, timing, materials, supports, standards, and sources.</p></div></li><li><span>02</span><div><h3>Build and revise</h3><p>Edit the whole lesson or regenerate one section while preserving the rest.</p></div></li><li><span>03</span><div><h3>Review and export</h3><p>Check every claim and answer, then prepare Word or PDF copies.</p></div></li></ol></section>
+  </main>
+  <footer class="site-footer shell"><strong>AQOLYTE</strong><p>Local prototype · AI output requires teacher review · v0.2.1</p></footer>
+
+  {% elif current == 'guided' %}
+  <header class="guided-header shell"><a class="guided-brand" href="/design-options/guided">AQOLYTE</a><nav><a href="#journey">How it works</a><a href="/worksheet">Quick worksheet</a><a class="mini-button" href="/builder/">Open planner</a></nav></header>
+  <main class="guided-main">
+    <section class="guided-hero shell"><p class="guided-kicker">LESSON DESIGN, STEP BY STEP</p><h1>Move from an idea to classroom-ready materials with a clear next step.</h1><p>A guided workspace for drafting, revising, reviewing, and exporting lessons—without surrendering teacher judgment.</p><div><a class="guided-button" href="/builder/">Begin a guided lesson</a><a class="guided-link" href="/worksheet">I only need a worksheet →</a></div></section>
+    <section class="journey shell" id="journey"><div class="journey-title"><p class="guided-kicker">YOUR JOURNEY</p><h2>Four stages. One visible path.</h2></div><ol>
+      <li><span>1</span><h3>Context</h3><p>Define learners, goals, time, materials, and source evidence.</p></li>
+      <li><span>2</span><h3>Lesson</h3><p>Select an approach and shape each module.</p></li>
+      <li><span>3</span><h3>Materials</h3><p>Create student handouts and separate teacher answers.</p></li>
+      <li><span>4</span><h3>Review</h3><p>Check the draft and export the version you approved.</p></li>
+    </ol></section>
+    <section class="guided-callout shell"><div><p class="guided-kicker">RETURNING TEACHER</p><h2>{% if has_draft %}Continue the lesson saved in this session.{% else %}Your next draft will stay available in this session.{% endif %}</h2></div><a href="/builder/">{% if has_draft %}Resume lesson{% else %}Create lesson{% endif %} →</a></section>
+  </main>
+  <footer class="guided-footer shell"><p>Aqolyte local prototype · Generated content is unverified until teacher review.</p></footer>
+
+  {% else %}
+  <div class="studio-layout">
+    <aside class="studio-rail"><a class="studio-brand" href="/design-options/studio"><span>A</span><strong>AQOLYTE</strong></a><nav aria-label="Workspace"><a class="active" href="/builder/"><span>01</span>Lesson studio</a><a href="{% if has_draft %}/handouts/{% else %}/builder/{% endif %}"><span>02</span>Student materials</a><a href="/worksheet"><span>03</span>Quick worksheet</a></nav><div class="rail-note"><span>LOCAL PROTOTYPE</span><p>AI content requires review.</p><small>Version 0.2.1</small></div></aside>
+    <main class="studio-main"><header><p>TEACHER DASHBOARD</p><a href="/design-options/">Compare designs ↗</a></header><section class="studio-intro"><div><h1>Start where the work starts.</h1><p>Choose a task. The studio keeps the lesson, materials, and exports connected inside this browser session.</p></div><a class="studio-primary" href="/builder/">New lesson <span>→</span></a></section>
+      <section class="studio-actions"><a href="/builder/"><span>01 / PLAN</span><h2>Lesson studio</h2><p>Presets, custom modules, section editing, review, and export.</p><strong>Open →</strong></a><a href="{% if has_draft %}/handouts/{% else %}/builder/{% endif %}"><span>02 / PREPARE</span><h2>Student materials</h2><p>Handouts, answer keys, themes, and separate copies.</p><strong>{% if has_draft %}Open{% else %}Requires a saved lesson{% endif %} →</strong></a><a href="/worksheet"><span>03 / QUICK TASK</span><h2>Worksheet</h2><p>A standalone route for a focused practice set.</p><strong>Open →</strong></a></section>
+      <section class="studio-evidence"><p>RELEASE EVIDENCE</p><div><strong>86</strong><span>offline regression tests</span></div><div><strong>23</strong><span>pages in long-export QA</span></div><div><strong>0</strong><span>AI calls needed to create an outline</span></div></section>
+    </main>
+  </div>
+  {% endif %}
+</body>
+</html>

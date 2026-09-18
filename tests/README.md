@@ -19,6 +19,10 @@ mocked AI responses and made no paid API calls. It covers every generation entry
 provider-failure recovery, the audited route/asset surface, and long lesson and 20-item
 student/teacher handout exports.
 
+The isolated `codex/ui-navigation-redesign` experiment adds one safe-preview test, bringing
+that branch to 87 passing tests. The additional routes render three homepage/navigation
+concepts, make no AI calls, and do not replace the `v0.2.1` release homepage.
+
 The separate synthetic integration artifacts are stored in
 `../../lesson-export-qa/milestone1-closure`. The installed Microsoft Word converter produced a
 23-page PDF; representative pages were visually inspected for clipping, overlap, wrapping, and
