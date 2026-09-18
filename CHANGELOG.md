@@ -12,6 +12,34 @@ All notable changes to LPAPP are recorded here. The project uses
 - Distributed request coordination and production deployment controls
 - Structured evaluation with teacher feedback
 
+## [0.2.1] - 2026-09-17
+
+### Changed
+
+- Archived confirmed unreferenced legacy templates and static assets outside production
+  directories while preserving them in repository history
+- Documented the complete reachable route, generation, export, template, and static-asset
+  surface for the local prototype
+
+### Security and reliability
+
+- Expanded provider-failure coverage across every generation entry point for authentication,
+  exhausted credit, rate limiting, timeout, network, API-status, empty, incomplete, and
+  oversized responses
+- Added exact route and production-asset inventory tests so future surface changes require an
+  explicit audit update
+- Expanded the offline regression suite from 75 to 86 tests
+- Verified long lesson and 20-item handout exports without AI calls; the installed Microsoft
+  Word converter produced and preserved all content in a visually inspected 23-page PDF
+
+### Known limits
+
+- This closes the local-prototype Milestone 1 acceptance criteria; distributed coordination,
+  production access control, Linux PDF conversion, and operational spending controls remain
+  production work
+- Structural and export checks still do not establish factual accuracy, standards alignment,
+  answer correctness, accessibility conformance, or educational effectiveness
+
 ## [0.2.0] - 2026-09-17
 
 This is the first formally tagged LPAPP release. Earlier commits remain available in Git
@@ -60,5 +88,6 @@ history but predate the release process.
 - Public deployment still requires access control, durable shared state, and operational
   monitoring
 
-[Unreleased]: https://github.com/Akqadafi/LPAPP/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Akqadafi/LPAPP/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/Akqadafi/LPAPP/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Akqadafi/LPAPP/releases/tag/v0.2.0

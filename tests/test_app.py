@@ -8,6 +8,7 @@ os.environ.setdefault("FLASK_SECRET_KEY", "unit-test-secret-not-for-production")
 os.environ.setdefault("OPENAI_API_KEY", "unit-test-placeholder")
 
 import app as app_module
+from openai_service import GenerationUnavailableError
 
 
 class AppRouteTests(unittest.TestCase):
@@ -67,6 +68,30 @@ class AppRouteTests(unittest.TestCase):
         response = self.client.post("/output", data={"download_word": "true"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[:2], b"PK")
+
+    @patch("app.lesson_planner.generate_lesson_plan", side_effect=GenerationUnavailableError("The AI service took too long to respond. Please retry; your saved draft is unchanged."))
+    def test_legacy_lesson_provider_failure_preserves_inputs(self, mock_generate):
+        saved = {"grade_level": "5", "topic": "Fractions"}
+        with self.client.session_transaction() as browser_session:
+            browser_session["input_data"] = saved
+        response = self.client.post("/output", data={"generate": "1"})
+        self.assertEqual(response.status_code, 503)
+        self.assertIn(b"too long to respond", response.data)
+        with self.client.session_transaction() as browser_session:
+            self.assertEqual(browser_session["input_data"], saved)
+            self.assertNotIn("content", browser_session)
+
+    @patch("app.generate_worksheet", side_effect=GenerationUnavailableError("The app could not connect to OpenAI. Check the server's internet access and retry. Your saved draft is unchanged."))
+    def test_legacy_worksheet_provider_failure_preserves_inputs(self, mock_generate):
+        saved = {"topic": "Fractions", "num_questions": 5, "question_types": "essay", "formatting_delimiter": "----", "grade_level": 5}
+        with self.client.session_transaction() as browser_session:
+            browser_session["worksheet_data"] = saved
+        response = self.client.post("/output", data={"generate": "1"})
+        self.assertEqual(response.status_code, 503)
+        self.assertIn(b"connect to OpenAI", response.data)
+        with self.client.session_transaction() as browser_session:
+            self.assertEqual(browser_session["worksheet_data"], saved)
+            self.assertNotIn("content", browser_session)
 
 
 if __name__ == "__main__":

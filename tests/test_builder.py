@@ -8,6 +8,7 @@ os.environ['FLASK_SECRET_KEY']='test-only-secret'
 os.environ['OPENAI_API_KEY']='mock-only'
 import app
 import builder
+from openai_service import GenerationUnavailableError
 from bs4 import BeautifulSoup
 from docx import Document
 
@@ -66,6 +67,11 @@ class BuilderTests(unittest.TestCase):
             self.assertEqual(self.state()['builder_draft'],old)
         mock.side_effect=RuntimeError('network unavailable')
         self.assertEqual(self.post('generate').status_code,503)
+        self.assertEqual(self.state()['builder_draft'],old)
+        mock.side_effect=GenerationUnavailableError('The API key was not accepted. Update the app configuration.')
+        response=self.post('generate')
+        self.assertEqual(response.status_code,503)
+        self.assertIn(b'API key was not accepted',response.data)
         self.assertEqual(self.state()['builder_draft'],old)
     @patch('builder.generate_text')
     def test_section_regeneration_preserves_other_content_and_resets_review(self,mock):
@@ -130,5 +136,17 @@ class BuilderTests(unittest.TestCase):
         page=self.client.get('/builder/')
         self.assertNotIn(b'<script>alert(1)</script>',page.data)
         self.assertIn(b'&lt;script&gt;',page.data)
+
+    def test_long_export_preserves_the_final_section_content(self):
+        self.create(mode='scratch',sections=['overview','activities','assessment'])
+        content='\n'.join(f'Step {i}: '+('detail ' * 70) for i in range(1,41))
+        final='FINAL EXPORT MARKER'
+        self.assertEqual(self.post('save',content_overview=content,content_activities=content,content_assessment=content+'\n'+final).status_code,302)
+        exported=self.post('export')
+        self.assertEqual(exported.status_code,200)
+        doc=Document(BytesIO(exported.data));text='\n'.join(p.text for p in doc.paragraphs)
+        self.assertIn('Step 40:',text)
+        self.assertIn(final,text)
+        self.assertGreater(len(doc.paragraphs),120)
 
 if __name__=='__main__': unittest.main()

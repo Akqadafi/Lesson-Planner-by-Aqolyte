@@ -9,6 +9,7 @@ os.environ.setdefault('FLASK_SECRET_KEY','test-only')
 os.environ.setdefault('OPENAI_API_KEY','mock-only')
 import app
 from handouts import fingerprint
+from openai_service import GenerationUnavailableError
 
 class HandoutTests(unittest.TestCase):
     def setUp(self):
@@ -59,6 +60,10 @@ class HandoutTests(unittest.TestCase):
             self.assertEqual(self.state()['builder_draft'],old)
         mock.side_effect=RuntimeError('Unavailable');self.assertEqual(self.post('generate').status_code,503)
         self.assertEqual(self.state()['builder_draft'],old);mock.side_effect=None
+        mock.side_effect=GenerationUnavailableError('The AI service is temporarily rate-limited. Wait and retry.')
+        response=self.post('generate');self.assertEqual(response.status_code,503)
+        self.assertIn(b'temporarily rate-limited',response.data)
+        self.assertEqual(self.state()['builder_draft'],old);mock.side_effect=None
         mock.return_value=json.dumps({'title':'Fractions','instructions':'Compare','questions':[{'id':1,'prompt':'Q1','answer':'A1'},{'id':2,'prompt':'Q2','answer':'A2'}]})
         self.assertEqual(self.post('generate').status_code,302)
         context=json.loads(mock.call_args.args[0][1]['content']);self.assertEqual(context['grade'],5)
@@ -68,5 +73,19 @@ class HandoutTests(unittest.TestCase):
         response=self.post('save',title='Attempted title',instructions='Explain',prompt_1='New question',answer_1='',prompt_2='Q',answer_2='A',font=12,space=3,paper='Letter')
         self.assertEqual(response.status_code,400);self.assertIn(b'Attempted title',response.data)
         self.assertEqual(self.state()['builder_draft'],old)
+
+    def test_long_twenty_item_exports_preserve_student_teacher_separation(self):
+        self.assertEqual(self.post('create',source='activities',count=20).status_code,302)
+        values={'title':'Long practice','instructions':'Complete every item.','font':12,'space':8,'paper':'Letter'}
+        for i in range(1,21):
+            values[f'prompt_{i}']=f'Question {i} '+('student detail ' * 35)
+            values[f'answer_{i}']=f'ANSWER {i} '+('teacher detail ' * 35)
+        self.assertEqual(self.post('save',**values).status_code,302)
+        student=self.post('student');teacher=self.post('teacher')
+        self.assertEqual(student.status_code,200);self.assertEqual(teacher.status_code,200)
+        student_text='\n'.join(p.text for p in Document(BytesIO(student.data)).paragraphs)
+        teacher_text='\n'.join(p.text for p in Document(BytesIO(teacher.data)).paragraphs)
+        self.assertIn('Question 20',student_text);self.assertNotIn('ANSWER 20',student_text)
+        self.assertIn('Question 20',teacher_text);self.assertIn('ANSWER 20',teacher_text)
 
 if __name__=='__main__':unittest.main()

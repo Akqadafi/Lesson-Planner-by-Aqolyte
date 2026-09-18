@@ -59,7 +59,7 @@ class ReliabilityAuditTests(unittest.TestCase):
 
     def test_metadata_contains_no_configuration(self):
         self.assertEqual(self.client.get('/health').json, {'status': 'ok'})
-        self.assertEqual(self.client.get('/version').json, {'app': 'LPAPP', 'version': '0.2.0'})
+        self.assertEqual(self.client.get('/version').json, {'app': 'LPAPP', 'version': '0.2.1'})
 
     @patch('worksheet_generator.generate_text')
     def test_invalid_delimiter_never_calls_model(self, model):

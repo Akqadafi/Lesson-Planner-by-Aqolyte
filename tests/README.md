@@ -9,13 +9,20 @@ These test files are stored locally alongside the app. They use Python unittest 
 | test_lesson_planner.py | Legacy response parsing, prompt context and invalid preset rejection |
 | test_reliability.py | All six legacy presets reject incomplete/duplicate/empty/unexpected sections; recovery of previous drafts; Word tables, merged/nested cells, lists, line breaks and content order |
 | test_worksheet_generator.py | Worksheet prompting, supported question types and question-count bounds |
+| test_service_errors.py | Provider authentication, credit, rate-limit, timeout, network, API-status, empty, incomplete, and oversized-response handling |
+| test_surface_audit.py | Exact reachable route/method and production template/static-asset inventory |
 
 ## Latest result
 
-2026-09-15: all 50 tests passed after adding PDF export routes and failure handling.
-Detailed output: ../../lesson-export-qa/test-results.txt
-Sample Word export: ../../lesson-export-qa/table-sample.docx
-Sample rendered PDF: ../../lesson-export-qa/table-sample.pdf
+2026-09-17: all 86 offline tests passed after the Milestone 1 closure audit. The suite uses
+mocked AI responses and made no paid API calls. It covers every generation entry point,
+provider-failure recovery, the audited route/asset surface, and long lesson and 20-item
+student/teacher handout exports.
+
+The separate synthetic integration artifacts are stored in
+`../../lesson-export-qa/milestone1-closure`. The installed Microsoft Word converter produced a
+23-page PDF; representative pages were visually inspected for clipping, overlap, wrapping, and
+page breaks.
 
 ## Run locally
 
@@ -31,7 +38,7 @@ The existing review environment on this computer can also run the suite:
 ..\lpapp-review\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-Read a test's assertions to see exactly what it verifies. A passing test does not establish the factual accuracy or teaching quality of real AI-generated lessons. The sample export is synthetic QA material, not evidence of live-model quality. Multi-page export checks, broad browser checks, independent standards verification and teacher evaluation remain in the work plan.
+Read a test's assertions to see exactly what it verifies. A passing test does not establish the factual accuracy or teaching quality of real AI-generated lessons. The sample export is synthetic QA material, not evidence of live-model quality. Broader accessibility checks, production Linux conversion, independent standards verification, and teacher evaluation remain in the work plan.
 
 `test_handouts.py` covers manual creation, editing, source context, separate student/teacher exports, stale lessons, input validation and atomic generation failure recovery.
 

@@ -1,4 +1,4 @@
-# Reliability audit — September 16, 2026
+# Reliability audit — September 16-17, 2026
 
 Scope: current local feature branch; no paid API calls or production deployment.
 
@@ -95,3 +95,17 @@ After restart, visually verified the wider worksheet and restored logo and inspe
 handout setup. Reset viewport to normal. This is a focused visual review, not a full
 accessibility certification or all-device test; keyboard/screen-reader and long-content
 edge cases remain for broader usability testing.
+
+## Milestone 1 closure — September 17
+
+Recorded the complete route/method and production template/static-asset inventory and moved
+confirmed unreferenced legacy artifacts to `archive/legacy-ui`. Added provider-failure recovery
+coverage across all four generation entry points and long lesson and 20-item student/teacher
+handout export coverage. The full offline suite now passes 86 tests.
+
+A separate no-AI integration check used the installed Microsoft Word converter to create a
+23-page Letter-size PDF from a synthetic 120-step lesson. Automated content checks and visual
+inspection of representative pages confirmed preservation through the final marker with no
+clipping or overlap. This closes Milestone 1 for the local prototype. Distributed coordination,
+production access/cost controls, Linux conversion, independent factual and standards checks,
+accessibility conformance, and educational-quality evaluation remain later milestones.
