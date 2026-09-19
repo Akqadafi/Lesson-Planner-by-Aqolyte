@@ -11,6 +11,8 @@ All notable changes to LPAPP are recorded here. The project uses
   educational, and applied AI tools, with Lesson Planner presented as its first product
 - Rebuilt About, Products, and Contact with the corporate design system and simplified the
   company-to-product path so the direct Lesson Planner launch appears only on Products
+- Restyled worksheet setup, generation confirmation, error, and result screens with the
+  Lesson Planner application theme and removed the redundant self-link from its header
 
 ### Planned
 

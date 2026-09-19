@@ -20,7 +20,7 @@ provider-failure recovery, the audited route/asset surface, and long lesson and 
 student/teacher handout exports.
 
 The isolated `codex/ui-navigation-redesign` experiment adds safe-preview and corporate-site
-tests, bringing that branch to 89 passing tests. The additional routes render three
+tests, bringing that branch to 90 passing tests. The additional routes render three
 homepage/navigation concepts, make no AI calls, and do not alter the `v0.2.1` release on
 `main`.
 

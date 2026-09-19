@@ -1,1 +1,25 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Generate your draft</title><link rel="stylesheet" href="{{ url_for('static',filename='css/builder.css') }}"></head><body><main><section class="panel"><h1>Ready to generate</h1><p>Your inputs are saved. Generating a draft uses the configured AI service and API credits. Opening or refreshing this page does not generate content.</p><form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button name="generate" value="1">Generate draft</button></form><a href="{{ url_for('builder.index') }}">Back to lesson studio</a></section></main></body></html>
+{% set worksheet_mode = session.get('worksheet_data') and not session.get('input_data') %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ready to generate · Aqolyte Lesson Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/builder.css') }}">
+</head>
+<body>
+  <header><a href="/">AQOLYTE</a><nav><a href="{{ url_for('builder.index') }}">Lesson Planner</a></nav></header>
+  <main class="worksheet-main">
+    <p class="eyebrow">{{ 'QUICK WORKSHEET' if worksheet_mode else 'LESSON DRAFT' }}</p>
+    <h1>Ready to generate.</h1>
+    <section class="panel generation-panel">
+      <h2>Your inputs are saved.</h2>
+      <p>Generating {{ 'a worksheet' if worksheet_mode else 'a draft' }} uses the configured AI service and API credits. Opening or refreshing this page does not generate content.</p>
+      <div class="actions">
+        <form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button class="primary" name="generate" value="1">Generate {{ 'worksheet' if worksheet_mode else 'draft' }}</button></form>
+        <a href="{{ url_for('worksheet') if worksheet_mode else url_for('builder.index') }}">Back to {{ 'worksheet setup' if worksheet_mode else 'Lesson Planner' }}</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

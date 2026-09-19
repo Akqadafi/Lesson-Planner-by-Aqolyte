@@ -1,25 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worksheet</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/builder.css') }}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Worksheet draft · Aqolyte Lesson Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/builder.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Worksheet</h1>
-        <h2>Worksheet Content</h2>
-        <pre>{{ content }}</pre>
-        <!-- Form to download the worksheet as a Word document -->
-        <form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}">
-            <input type="hidden" name="download_word" value="true">
-            <button type="submit">Download as Word Document</button>
-        </form>
-        <form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button name="download_pdf" value="true">Download PDF</button></form>
-        <!-- Button to return home -->
-        <a href="{{ url_for('landing') }}" class="btn btn-primary mt-3">Return Home</a>
-    </div>
+  <header><a href="/">AQOLYTE</a><nav><a href="/builder/">Lesson Planner</a></nav></header>
+  <main class="worksheet-main">
+    <p class="eyebrow">GENERATED WORKSHEET</p>
+    <h1>Worksheet draft.</h1>
+    <p class="intro">Review every question and answer before sharing this material with students.</p>
+
+    <section class="panel worksheet-result">
+      <div class="heading"><div><p class="eyebrow">CONTENT</p><h2>Questions and answer material</h2></div><span class="badge">Needs teacher review</span></div>
+      <pre class="worksheet-output">{{ content }}</pre>
+      <div class="actions worksheet-actions">
+        <form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit" name="download_word" value="true">Download Word</button></form>
+        <form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit" name="download_pdf" value="true">Download PDF</button></form>
+        <a href="{{ url_for('worksheet') }}">Create another worksheet</a>
+      </div>
+    </section>
+  </main>
 </body>
 </html>

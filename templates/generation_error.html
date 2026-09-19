@@ -1,1 +1,25 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lesson needs another attempt</title><link rel="stylesheet" href="{{ url_for('static',filename='css/builder.css') }}"></head><body><main><section class="panel"><h1>{{ 'PDF export is unavailable' if export_error else 'We couldn’t complete this draft' }}</h1><p role="alert">{{ message }}</p><div class="actions">{% if export_error %}<a href="{{ url_for('output') }}">Back to saved content and Word download</a>{% else %}<form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit" name="generate" value="1">Retry generation</button></form>{% endif %}<a href="{{ url_for('home') }}">Return to lesson form</a>{% if previous %}<form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button name="restore_previous" value="1">Restore previous lesson</button></form>{% endif %}<a href="{{ url_for('builder.index') }}">Open lesson studio</a></div></section></main></body></html>
+{% set worksheet_mode = session.get('worksheet_data') or session.get('content_type') == 'Worksheet' %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Generation needs another attempt · Aqolyte</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/builder.css') }}">
+</head>
+<body>
+  <header><a href="/">AQOLYTE</a><nav><a href="{{ url_for('builder.index') }}">Lesson Planner</a></nav></header>
+  <main class="worksheet-main">
+    <p class="eyebrow">{{ 'QUICK WORKSHEET' if worksheet_mode else 'LESSON DRAFT' }}</p>
+    <h1>{{ 'PDF export is unavailable' if export_error else 'We couldn’t complete this draft.' }}</h1>
+    <section class="panel generation-panel">
+      <p class="notice error" role="alert">{{ message }}</p>
+      <div class="actions">
+        {% if export_error %}<a href="{{ url_for('output') }}">Back to saved content and Word download</a>{% else %}<form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit" name="generate" value="1">Retry generation</button></form>{% endif %}
+        <a href="{{ url_for('worksheet') if worksheet_mode else url_for('builder.index') }}">Return to {{ 'worksheet setup' if worksheet_mode else 'Lesson Planner' }}</a>
+        {% if previous %}<form method="post" action="{{ url_for('output') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button name="restore_previous" value="1">Restore previous lesson</button></form>{% endif %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

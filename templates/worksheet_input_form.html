@@ -1,42 +1,58 @@
-{% extends 'landing.html' %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quick worksheet · Aqolyte Lesson Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/builder.css') }}">
+</head>
+<body>
+  <header><a href="/">AQOLYTE</a><nav><a href="/builder/">Lesson Planner</a></nav></header>
+  <main class="worksheet-main">
+    <p class="eyebrow">QUICK WORKSHEET</p>
+    <h1>Build focused practice.</h1>
+    <p class="intro">Set the topic, grade, and question format. You will review the request before any AI generation begins.</p>
 
-{% block content %}
-<div class="container d-flex align-items-center justify-content-center min-vh-100">
-    <div class="text-center w-50">
-        <h2>Create a Worksheet</h2><p>Generated answers need teacher review before classroom use.</p><a href="/builder/">Back to lesson studio</a>
-        <form method="POST"><input type="hidden" name="csrf" value="{{ csrf_token() }}">
-            <div class="form-group">
-                <label for="topic">Topic:</label>
-                <input type="text" class="form-control" id="topic" name="topic" required>
-            </div>
-            <div class="form-group">
-                <label for="grade_level">Grade (0 = kindergarten)</label><input id="grade_level" name="grade_level" type="number" min="0" max="12" value="5" required><label for="question_types">Question Types:</label>
-                <select class="form-control" id="question_types" name="question_types" required>
-                    <option value="multiple_choice">Multiple Choice</option>
-                    <option value="short_answer">Short Answer</option>
-                    <option value="essay">Essay</option>
-                    <option value="true_false">True/False</option>
-                    <option value="matching">Matching</option>
-                    <option value="Mix">Mixed: short answer, blanks, matching</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="num_questions">Number of Questions:</label>
-                <input type="number" class="form-control" id="num_questions" name="num_questions" min="1" max="50" required>
-            </div>
-            <div class="form-group">
-                <label for="delimiter">Formatting Delimiter:</label>
-<select class="form-control" id="delimiter" name="delimiter" required>
-    <option value="----">Horizontal Line (----)</option>
-    <option value="###">Hashes (###)</option>
-    <option value="[---]">Square Brackets ([---])</option>
-    <option value="\n\n">Double Line Breaks</option>
-    <option value=">>>">Special Characters (>>>)</option>
-</select>
-</div>
-<button type="submit" class="btn btn-primary btn-lg mt-3">Submit</button>
-</form>
-</div>
-</div>
+    <section class="panel worksheet-setup">
+      <div class="heading"><div><p class="eyebrow">WORKSHEET SETUP</p><h2>What should students practice?</h2></div><span class="badge">Teacher review required</span></div>
+      <form method="post">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <label for="topic">Topic
+          <input type="text" id="topic" name="topic" maxlength="300" placeholder="For example: comparing fractions" required>
+        </label>
+        <div class="grid worksheet-grid">
+          <label for="grade_level">Grade <span class="label-note">(0 = kindergarten)</span>
+            <input id="grade_level" name="grade_level" type="number" min="0" max="12" value="5" required>
+          </label>
+          <label for="num_questions">Number of questions
+            <input type="number" id="num_questions" name="num_questions" min="1" max="50" value="10" required>
+          </label>
+          <label for="question_types">Question format
+            <select id="question_types" name="question_types" required>
+              <option value="multiple_choice">Multiple choice</option>
+              <option value="short_answer">Short answer</option>
+              <option value="essay">Essay</option>
+              <option value="true_false">True or false</option>
+              <option value="matching">Matching</option>
+              <option value="Mix">Mixed: short answer, blanks, and matching</option>
+            </select>
+          </label>
+          <label for="delimiter">Question separator
+            <select id="delimiter" name="delimiter" required>
+              <option value="----">Horizontal line</option>
+              <option value="###">Hashes</option>
+              <option value="[---]">Square brackets</option>
+              <option value="\n\n">Blank line</option>
+              <option value=">>>">Angle marks</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="primary">Continue to generation</button>
+        <p class="hint">This step saves the worksheet request. Generation happens only after you confirm it on the next screen and uses your configured API.</p>
+      </form>
+    </section>
 
-{% endblock %}
+    <aside class="notice worksheet-notice"><strong>Before classroom use</strong><p>Check question clarity, answer accuracy, reading level, and alignment with the lesson. Structural validation does not establish factual correctness.</p></aside>
+  </main>
+</body>
+</html>

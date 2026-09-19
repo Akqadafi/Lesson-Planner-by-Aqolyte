@@ -69,3 +69,23 @@ class SurfaceAuditTests(unittest.TestCase):
         self.assertIn(b'mailto:ceo@aqolyte.com', pages['/contact'].data)
         for path in ('/', '/about', '/contact'):
             self.assertNotIn(b'href="/builder/"', pages[path].data, path)
+
+    def test_lesson_header_and_worksheet_share_the_application_theme(self):
+        client = app.app.test_client()
+        lesson = client.get('/builder/')
+        self.assertEqual(lesson.status_code, 200)
+        self.assertNotIn(b'>Lesson studio</a>', lesson.data)
+        self.assertEqual(lesson.data.count(b'href="/worksheet"'), 1)
+
+        setup = client.get('/worksheet')
+        self.assertEqual(setup.status_code, 200)
+        self.assertIn(b'css/builder.css', setup.data)
+        self.assertIn(b'QUICK WORKSHEET', setup.data)
+        self.assertNotIn(b'bootstrap', setup.data.lower())
+
+        with client.session_transaction() as browser_session:
+            browser_session['content_type'] = 'Worksheet'
+            browser_session['content'] = 'Question 1\nAnswer 1'
+        result = client.get('/output')
+        self.assertIn(b'GENERATED WORKSHEET', result.data)
+        self.assertIn(b'css/builder.css', result.data)

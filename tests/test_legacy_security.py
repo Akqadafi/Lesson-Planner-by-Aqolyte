@@ -21,7 +21,7 @@ class LegacySecurityTests(unittest.TestCase):
         for _ in range(2):
             page = self.client.get('/output')
             self.assertEqual(page.status_code, 200)
-            self.assertIn(b'Generate draft', page.data)
+            self.assertIn(b'Generate worksheet', page.data)
         model.assert_not_called()
         self.assertEqual(self.client.post('/output', data={'csrf':token}).status_code,400)
         model.assert_not_called()
