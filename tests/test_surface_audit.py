@@ -66,5 +66,6 @@ class SurfaceAuditTests(unittest.TestCase):
             self.assertIn(b'AQOLYTE', response.data, path)
             self.assertNotIn(b'bootstrap', response.data.lower(), path)
         self.assertEqual(pages['/products'].data.count(b'href="/builder/"'), 1)
+        self.assertIn(b'mailto:ceo@aqolyte.com', pages['/contact'].data)
         for path in ('/', '/about', '/contact'):
             self.assertNotIn(b'href="/builder/"', pages[path].data, path)
