@@ -26,7 +26,7 @@ class SurfaceAuditTests(unittest.TestCase):
         templates = {path.relative_to(root/'templates').as_posix() for path in (root/'templates').rglob('*') if path.is_file()}
         expected_templates = {
             'about.html','builder.html','choose.html','contact.html','features.html',
-            'design_options.html','generation_error.html','generation_ready.html','handouts.html','home.html',
+            'corporate_base.html','design_options.html','generation_error.html','generation_ready.html','handouts.html','home.html',
             'landing.html','products.html','prompt0_form.html','prompt1_form.html',
             'prompt2_form.html','prompt3_form.html','prompt4_form.html','prompt5_form.html',
             'second_landing.html','unit_plan.html','worksheet_display.html','worksheet_input_form.html',
@@ -52,5 +52,19 @@ class SurfaceAuditTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         for text in (b'Aqolyte LLC', b'Web products', b'Education tools', b'Applied AI', b'Aqolyte Lesson Planner'):
             self.assertIn(text, response.data)
-        for destination in (b'href="/about"', b'href="/products"', b'href="/contact"', b'href="/builder/"'):
+        for destination in (b'href="/about"', b'href="/products"', b'href="/contact"'):
             self.assertIn(destination, response.data)
+        self.assertNotIn(b'href="/builder/"', response.data)
+        self.assertIn(b'Explore Lesson Planner', response.data)
+
+    def test_corporate_pages_share_theme_and_one_product_launch(self):
+        client = app.app.test_client()
+        pages = {path: client.get(path) for path in ('/', '/about', '/products', '/contact')}
+        for path, response in pages.items():
+            self.assertEqual(response.status_code, 200, path)
+            self.assertIn(b'css/corporate.css', response.data, path)
+            self.assertIn(b'AQOLYTE', response.data, path)
+            self.assertNotIn(b'bootstrap', response.data.lower(), path)
+        self.assertEqual(pages['/products'].data.count(b'href="/builder/"'), 1)
+        for path in ('/', '/about', '/contact'):
+            self.assertNotIn(b'href="/builder/"', pages[path].data, path)

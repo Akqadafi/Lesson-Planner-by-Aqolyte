@@ -1,1 +1,25 @@
-{% extends 'landing.html' %}{% block content %}<div class='container mt-5'><h2>About this preview</h2><p>This local prototype does not offer a contact-message service. Share feedback directly with the person running the demonstration.</p><a href='/builder/'>Return to lesson studio</a></div>{% endblock %}
+{% extends 'corporate_base.html' %}
+{% block title %}Contact Aqolyte LLC{% endblock %}
+{% block description %}Contact Aqolyte LLC about Lesson Planner, educational technology, applied AI, and future collaborations.{% endblock %}
+
+{% block content %}
+  <section class="interior-hero contact-hero page-shell">
+    <div><p class="eyebrow">CONTACT</p><h1>Start a useful conversation.</h1></div>
+    <p class="interior-deck">Questions about Lesson Planner, feedback from educators, and thoughtful collaboration ideas are welcome.</p>
+  </section>
+
+  <section class="contact-options page-shell">
+    <article class="contact-primary">
+      <p class="eyebrow">EMAIL AQOLYTE</p>
+      <h2>Tell us what you are working on.</h2>
+      <p>For now, Aqolyte inquiries are handled directly by email. Include the product, problem, or collaboration you would like to discuss.</p>
+      <a class="contact-email" href="mailto:akqadafi@gmail.com">akqadafi@gmail.com <span aria-hidden="true">↗</span></a>
+    </article>
+    <aside class="contact-note">
+      <span>GOOD TO INCLUDE</span>
+      <ul><li>Your role or organization</li><li>What you are trying to accomplish</li><li>How Lesson Planner or Aqolyte may help</li><li>Any timeline or testing context</li></ul>
+    </aside>
+  </section>
+
+  <section class="next-step page-shell"><div><p class="eyebrow">EXPLORE FIRST</p><h2>Want more context before reaching out?</h2></div><a class="button dark" href="/products">View products</a></section>
+{% endblock %}

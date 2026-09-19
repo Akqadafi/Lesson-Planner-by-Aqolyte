@@ -1,10 +1,32 @@
-{% extends 'landing.html' %}
+{% extends 'corporate_base.html' %}
+{% block title %}Products · Aqolyte Lesson Planner{% endblock %}
+{% block description %}Explore Aqolyte Lesson Planner, a modular teacher-controlled workspace for lesson drafts, student materials, review, and export.{% endblock %}
 
 {% block content %}
-<div class="container d-flex align-items-center justify-content-center min-vh-100">
-    <div class="text-center">
-        <h1 class="display-4 mb-4">Our Products</h1>
-        <a href="{{ url_for('second_landing') }}" class="btn btn-primary btn-lg">Go to Lesson Plan App</a>
-    </div>
-</div>
+  <section class="interior-hero product-page-hero page-shell">
+    <div><p class="eyebrow">PRODUCTS / 01</p><h1>Lesson planning with room for teacher judgment.</h1></div>
+    <div class="product-launch-card"><span>IN DEVELOPMENT</span><p>A modular workspace for lesson drafts, classroom activities, student handouts, answer keys, review, and export.</p><a class="button primary" href="/builder/">Open Lesson Planner</a></div>
+  </section>
+
+  <section class="product-story page-shell">
+    <div><p class="eyebrow">THE PRODUCT</p><h2>From classroom context to a reviewed draft.</h2></div>
+    <p>Lesson Planner helps teachers create a structured starting point without turning generation into a one-click black box. Teachers choose an instructional approach, describe their learners and available materials, edit individual sections, and approve the complete lesson before export.</p>
+  </section>
+
+  <section class="workflow-section page-shell" aria-labelledby="workflow-title">
+    <div class="section-intro"><p class="eyebrow">HOW IT WORKS</p><h2 id="workflow-title">A visible, editable workflow.</h2></div>
+    <ol class="workflow-grid">
+      <li><span>01</span><div><h3>Set the context</h3><p>Add grade, duration, goals, prior knowledge, materials, learner supports, standards, and source context.</p></div></li>
+      <li><span>02</span><div><h3>Build the lesson</h3><p>Choose a preset approach or assemble a custom plan from the sections the lesson needs.</p></div></li>
+      <li><span>03</span><div><h3>Prepare materials</h3><p>Create worksheets, activities, handouts, and separate teacher answer materials.</p></div></li>
+      <li><span>04</span><div><h3>Review and export</h3><p>Edit the draft, regenerate one section when needed, and approve the result before downloading it.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="product-status page-shell">
+    <div><p class="eyebrow">CURRENT STATUS</p><h2>Built for careful evaluation.</h2></div>
+    <div><p>Lesson Planner is an active prototype. Generation requires a configured API account, and generated content still requires teacher review.</p><p>Standards alignment and factual accuracy are not yet independently verified. Those safeguards remain part of the product roadmap.</p></div>
+  </section>
+
+  <section class="contact-banner page-shell"><p class="eyebrow">PRODUCT FEEDBACK</p><h2>Interested in testing Lesson Planner or discussing an education workflow?</h2><a href="/contact">Contact Aqolyte →</a></section>
 {% endblock %}

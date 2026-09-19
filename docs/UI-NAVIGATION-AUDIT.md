@@ -83,3 +83,26 @@ The next company-site pages are About, Products, a dedicated Lesson Planner prod
 Contact. These should reuse the corporate header and footer. After those are complete, the
 Lesson Planner should receive its own app shell and dashboard without duplicating the company
 marketing navigation.
+
+## Corporate navigation research and decision
+
+The company pages now use one shared header and footer with Home, About, Products, and Contact.
+The homepage explains the company and introduces Lesson Planner, while Products contains the
+single direct launch into the application. This removes repeated Lesson Planner links that made
+the homepage appear to offer more choices than it actually did.
+
+This decision follows three established findings:
+
+- Nielsen Norman Group observed that repeated navigation links make people scan duplicate
+  choices and increase the effort needed to decide where to go:
+  https://www.nngroup.com/articles/navigation-cognitive-strain/
+- W3C guidance recommends descriptive link names and consistent identification for controls
+  with the same function:
+  https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-link-only.html
+- Homepage guidance recommends a clear primary navigation area, grouped destinations, and
+  direct access only for carefully selected high-priority tasks:
+  https://www.nngroup.com/articles/113-design-guidelines-homepage-usability/
+
+The corporate pages also use unique page titles, visible active-page states, a skip link, and
+responsive navigation. The application remains a separate product layer and will receive its
+own task-oriented shell in the next interface milestone.

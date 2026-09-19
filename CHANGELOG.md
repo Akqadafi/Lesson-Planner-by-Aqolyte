@@ -9,6 +9,8 @@ All notable changes to LPAPP are recorded here. The project uses
 
 - Reframed the experimental homepage around Aqolyte LLC as the parent company for web,
   educational, and applied AI tools, with Lesson Planner presented as its first product
+- Rebuilt About, Products, and Contact with the corporate design system and simplified the
+  company-to-product path so the direct Lesson Planner launch appears only on Products
 
 ### Planned
 

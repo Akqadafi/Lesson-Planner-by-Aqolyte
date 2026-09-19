@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="{% block description %}Aqolyte LLC creates practical web, educational, and applied AI tools.{% endblock %}">
+  <title>{% block title %}Aqolyte LLC{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/corporate.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="company-header page-shell">
+    {% if request.endpoint == 'landing' %}
+      <span class="company-brand" aria-current="page"><span aria-hidden="true">A</span><strong>AQOLYTE</strong></span>
+    {% else %}
+      <a class="company-brand" href="/" aria-label="Aqolyte LLC home"><span aria-hidden="true">A</span><strong>AQOLYTE</strong></a>
+    {% endif %}
+    <nav class="desktop-nav" aria-label="Company navigation">
+      {% if request.endpoint == 'landing' %}<span aria-current="page">Home</span>{% else %}<a href="/">Home</a>{% endif %}
+      {% if request.endpoint == 'about' %}<span aria-current="page">About</span>{% else %}<a href="/about">About</a>{% endif %}
+      {% if request.endpoint == 'products' %}<span aria-current="page">Products</span>{% else %}<a href="/products">Products</a>{% endif %}
+      {% if request.endpoint == 'contact' %}<span aria-current="page">Contact</span>{% else %}<a href="/contact">Contact</a>{% endif %}
+    </nav>
+    <details class="mobile-menu">
+      <summary>Menu</summary>
+      <nav aria-label="Mobile company navigation">
+        {% if request.endpoint == 'landing' %}<span aria-current="page">Home</span>{% else %}<a href="/">Home</a>{% endif %}
+        {% if request.endpoint == 'about' %}<span aria-current="page">About</span>{% else %}<a href="/about">About</a>{% endif %}
+        {% if request.endpoint == 'products' %}<span aria-current="page">Products</span>{% else %}<a href="/products">Products</a>{% endif %}
+        {% if request.endpoint == 'contact' %}<span aria-current="page">Contact</span>{% else %}<a href="/contact">Contact</a>{% endif %}
+      </nav>
+    </details>
+  </header>
+
+  <main id="main-content">{% block content %}{% endblock %}</main>
+
+  <footer class="company-footer page-shell">
+    <div><strong>AQOLYTE LLC</strong><p>Practical web, educational, and applied AI tools.</p></div>
+    <nav aria-label="Footer navigation"><a href="/about">About</a><a href="/products">Products</a><a href="/contact">Contact</a></nav>
+    <p>© 2026 Aqolyte LLC</p>
+  </footer>
+</body>
+</html>
