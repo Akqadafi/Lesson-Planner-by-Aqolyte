@@ -100,23 +100,20 @@ def _lesson_blueprint(input_data: dict) -> str:
 def validate_input(data):
     if data.get('prompt') not in SECTION_ORDER:
         raise ValueError('Choose a supported lesson type.')
-    for field in ('topic', 'state', 'socioeconomic_level', 'experiential_type', 'lesson_type'):
+    for field in ('topic', 'state', 'lesson_type'):
         value = data.get(field, '')
         if not isinstance(value, str) or len(value) > 300:
             raise ValueError(f'{field} must be text of at most 300 characters.')
+    for field in ('prior_knowledge', 'learner_supports'):
+        value = data.get(field, '')
+        if not isinstance(value, str) or len(value) > 4000:
+            raise ValueError(f'{field} must be text of at most 4,000 characters.')
     if data['prompt'] == 'prompt1' and not data.get('lesson_type', '').strip():
         raise ValueError('Choose a lesson approach.')
-    groups = data.get('culture_group') or []
-    if isinstance(groups, str):
-        groups = [groups]
-    if not isinstance(groups, list) or len(groups) > 20 or any(not isinstance(v, str) or not v.strip() or len(v) > 100 for v in groups):
-        raise ValueError('Use at most 20 context entries of 1-100 characters.')
 
-    for field in ('state', 'socioeconomic_level', 'lesson_type'):
+    for field in ('state', 'lesson_type'):
         if data.get(field) and data[field] not in CHOICES[field]:
             raise ValueError(f'Choose a supported {field.replace("_", " ")}.')
-    if any(group not in CHOICES['culture_group'] for group in groups):
-        raise ValueError('Choose supported classroom context options.')
     for name, low, high in [('grade_level', 0, 12), ('number_of_students', 1, 100), ('number_of_words', 50, 5000)]:
         try:
             value = int(data.get(name, ''))
@@ -135,10 +132,6 @@ def generate_lesson_plan(input_data: dict) -> tuple[dict[str, str], list[str]]:
     if prompt_type not in SECTION_ORDER:
         raise ValueError(f"Invalid prompt selected: {prompt_type}")
 
-    cultures = input_data.get("culture_group") or []
-    if isinstance(cultures, str):
-        cultures = [cultures]
-    culture_description = ", ".join(cultures) if cultures else "not specified"
     ordered_sections = SECTION_ORDER[prompt_type]
     output_format = "\n\n".join(
         f"Section: {section}\nContent: <detailed content>" for section in ordered_sections
@@ -149,18 +142,15 @@ You are an education specialist. {_lesson_blueprint(input_data)}
 
 Create a draft for teacher review; do not claim factual accuracy or verified standards alignment. Do not invent standard identifiers, citations or source URLs. Mark unsupported alignment as needing verification. Include engaging
 introductory and concluding activities, discussions, hands-on work, assessment questions, differentiation,
-and a detailed student worksheet where appropriate.
+and a detailed student worksheet where appropriate. Use only the learner needs the teacher describes. Do not
+infer abilities, interests or support needs from identity or demographic characteristics.
 
 Class context:
 - Target length: {_required(input_data, 'number_of_words')} words
 - Grade: {_required(input_data, 'grade_level')}
 - Students: {_required(input_data, 'number_of_students')}
-- Cultural groups: {culture_description}
-- Socioeconomic context: {input_data.get('socioeconomic_level') or 'not specified'}
-- Experiential context: {input_data.get('experiential_type') or 'not specified'}
-- Students with disabilities: {'yes' if input_data.get('disabled') else 'no'}
-- English-language learners: {'yes' if input_data.get('ell') else 'no'}
-- Gifted students: {'yes' if input_data.get('gifted') else 'no'}
+- Prior knowledge and skills: {input_data.get('prior_knowledge') or 'not specified'}
+- Teacher-described learner support: {input_data.get('learner_supports') or 'not specified'}
 - Requested state (standards are not retrieved or verified): {input_data.get('state') or 'not specified'}
 
 Return only the following section format. Preserve each section title exactly:

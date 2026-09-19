@@ -10,12 +10,8 @@ SAMPLE_INPUT = {
     "number_of_words": "500",
     "grade_level": "5",
     "number_of_students": "30",
-    "culture_group": ["Black", "Latino"],
-    "socioeconomic_level": "Medium",
-    "experiential_type": "Mixed",
-    "disabled": True,
-    "ell": False,
-    "gifted": True,
+    "prior_knowledge": "Students can label the main parts of a plant cell.",
+    "learner_supports": "Use diagrams, a vocabulary bank, and oral or written responses.",
     "state": "Arizona",
 }
 
@@ -44,18 +40,22 @@ class LessonPlannerTests(unittest.TestCase):
         self.assertEqual(plan["Lesson Plan Purpose Statement"], "Learn photosynthesis.")
         self.assertEqual(order, lesson_planner.SECTION_ORDER["prompt3"])
         sent_messages = mock_generate.call_args.args[0]
-        self.assertIn("Black, Latino", sent_messages[1]["content"])
+        prompt = sent_messages[1]["content"]
+        self.assertIn("Students can label the main parts of a plant cell.", prompt)
+        self.assertIn("Use diagrams, a vocabulary bank", prompt)
+        self.assertNotIn("Cultural groups", prompt)
 
     @patch("lesson_planner.generate_text")
-    def test_single_culture_string_is_not_split_into_characters(self, mock_generate):
+    def test_unsupplied_learning_context_is_marked_not_specified(self, mock_generate):
         mock_generate.return_value = "\n\n".join(
             f"Section: {name}\nContent: Ready"
             for name in lesson_planner.SECTION_ORDER['prompt3']
         )
-        data = dict(SAMPLE_INPUT, culture_group="Latino")
+        data = dict(SAMPLE_INPUT, prior_knowledge="", learner_supports="")
         lesson_planner.generate_lesson_plan(data)
         sent_messages = mock_generate.call_args.args[0]
-        self.assertIn("Cultural groups: Latino", sent_messages[1]["content"])
+        self.assertIn("Prior knowledge and skills: not specified", sent_messages[1]["content"])
+        self.assertIn("Teacher-described learner support: not specified", sent_messages[1]["content"])
 
     def test_invalid_prompt_is_rejected(self):
         with self.assertRaises(ValueError):

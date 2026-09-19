@@ -33,9 +33,12 @@ class MixedAuditTests(unittest.TestCase):
             soup=BeautifulSoup(path.read_text(encoding='utf-8'),'html.parser')
             for select in soup.select('select[name]'):
                 self.assertEqual(set(CHOICES[select['name']]),{option['value'] for option in select.select('option')})
-            self.assertEqual(set(CHOICES['culture_group']),{x['value'] for x in soup.select('[name=culture_group]')})
+            self.assertIsNotNone(soup.select_one('[name=prior_knowledge]'))
+            self.assertIsNotNone(soup.select_one('[name=learner_supports]'))
+            for retired in ('culture_group','socioeconomic_level','experiential_type','disabled','ell','gifted'):
+                self.assertIsNone(soup.select_one(f'[name={retired}]'))
     @patch('lesson_planner.generate_text')
     def test_forged_legacy_options_rejected(self, model):
-        for change in ({'state':'Atlantis'},{'socioeconomic_level':'unsupported'},{'culture_group':['unsupported']},{'prompt':'prompt1','lesson_type':'unsupported'}):
+        for change in ({'state':'Atlantis'},{'prompt':'prompt1','lesson_type':'unsupported'}):
             with self.assertRaises(ValueError):lesson_planner.generate_lesson_plan(dict(SAMPLE_INPUT,**change))
         model.assert_not_called()

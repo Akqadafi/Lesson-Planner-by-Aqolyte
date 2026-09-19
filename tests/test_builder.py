@@ -74,6 +74,17 @@ class BuilderTests(unittest.TestCase):
         self.assertIn(b'API key was not accepted',response.data)
         self.assertEqual(self.state()['builder_draft'],old)
     @patch('builder.generate_text')
+    def test_prior_knowledge_is_saved_and_sent_to_generation(self,mock):
+        prior='Students can identify numerators and denominators.'
+        supports='Provide fraction strips and sentence starters.'
+        self.create(mode='scratch',sections=['objectives'],prior_knowledge=prior,supports=supports)
+        self.assertEqual(self.state()['builder_draft']['config']['prior_knowledge'],prior)
+        mock.return_value=json.dumps({'sections':[{'id':'objectives','content':'Compare fractions.'}]})
+        self.assertEqual(self.post('generate').status_code,302)
+        context=json.loads(mock.call_args.args[0][1]['content'])
+        self.assertEqual(context['prior_knowledge'],prior)
+        self.assertEqual(context['supports'],supports)
+    @patch('builder.generate_text')
     def test_section_regeneration_preserves_other_content_and_resets_review(self,mock):
         self.create(mode='scratch',sections=['worksheet','answers'])
         self.post('save',content_worksheet='Question',content_answers='Answer')

@@ -31,54 +31,14 @@
                 <input type="number" class="form-control" id="number_of_students" name="number_of_students" required>
             </div>
             <div class="form-group">
-                <label>Culture Group:</label><br>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="black" name="culture_group" value="Black">
-                    <label class="form-check-label" for="black">Black</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="latino" name="culture_group" value="Latino">
-                    <label class="form-check-label" for="latino">Latino</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="white" name="culture_group" value="White">
-                    <label class="form-check-label" for="white">White</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="asian" name="culture_group" value="Asian">
-                    <label class="form-check-label" for="asian">Asian</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="american_indian" name="culture_group" value="American Indian">
-                    <label class="form-check-label" for="american_indian">American Indian</label>
-                </div>
+                <label for="prior_knowledge">Prior Knowledge and Skills <span class="text-muted">(optional)</span>:</label>
+                <textarea class="form-control" id="prior_knowledge" name="prior_knowledge" rows="3" maxlength="4000" placeholder="Example: Students can identify numerators and denominators and use fraction strips, but they have not yet found common denominators."></textarea>
+                <small class="form-text text-muted">Describe what students already know or can do so the lesson starts at the right level.</small>
             </div>
             <div class="form-group">
-                <label for="socioeconomic_level">Socioeconomic Level:</label>
-                <select class="form-control" id="socioeconomic_level" name="socioeconomic_level" required>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="experiential_type">Experiential Type:</label>
-                <input type="text" class="form-control" id="experiential_type" name="experiential_type" required>
-            </div>
-            <div class="form-group">
-                <label>Additional Needs:</label><br>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="disabled" name="disabled" value="True">
-                    <label class="form-check-label" for="disabled">Disabled</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="ell" name="ell" value="True">
-                    <label class="form-check-label" for="ell">ELL</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="gifted" name="gifted" value="True">
-                    <label class="form-check-label" for="gifted">Gifted</label>
-                </div>
+                <label for="learner_supports">Learner Support and Accessibility <span class="text-muted">(optional)</span>:</label>
+                <textarea class="form-control" id="learner_supports" name="learner_supports" rows="4" maxlength="4000" placeholder="Example: Read directions aloud, provide a vocabulary bank and sentence starters, offer large-print materials, allow oral or written explanations, and add a challenge problem."></textarea>
+                <small class="form-text text-muted">Describe useful supports without student names, records, or broad demographic labels.</small>
             </div>
             <div class="form-group">
                 <label for="state">State:</label>

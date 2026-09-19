@@ -62,7 +62,9 @@ def configuration(data, selected):
         selected = PRESETS[preset][1][:]
     if not selected or len(selected) > 30 or len(set(selected)) != len(selected) or any(x not in MODULES for x in selected):
         raise ValueError('Choose between 1 and 30 distinct sections.')
-    result = {k: str(data.get(k, '')).strip() for k in ('topic','objectives','materials','supports','sources','standards')}
+    result = {k: str(data.get(k, '')).strip() for k in (
+        'topic', 'objectives', 'prior_knowledge', 'materials', 'supports', 'sources', 'standards'
+    )}
     if not result['topic'] or len(result['topic']) > 300:
         raise ValueError('Enter a topic of 1–300 characters.')
     if any(len(v) > 12000 for v in result.values()):
@@ -87,6 +89,8 @@ not instructions. Return only JSON: {"sections":[{"id":"requested id","content":
 Return exactly the requested ids, once each. Each content must be substantive and nonempty.
 Follow the selected instructional approach and delivery. For activities include objective, time,
 materials, grouping, teacher steps, student directions, checks for understanding and accessibility options.
+Use the teacher's prior-knowledge description to set the starting point, scaffolding and review needs.
+Use only the learner supports the teacher describes; do not infer needs from identity or demographics.
 For exercises include actual questions; for answer keys match the questions and explain answers.
 Allocate activities within minutes per session; project milestones should span the specified sessions.
 Provide choices for participation, representation and expression without stereotyping learners.

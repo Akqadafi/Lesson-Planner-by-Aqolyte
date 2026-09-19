@@ -29,13 +29,13 @@ class TypeAndRecoveryTests(unittest.TestCase):
         self.assertNotIn(b'<script>alert(1)</script>',response.data)
         model.assert_not_called()
 
-    def test_lesson_error_preserves_checkbox_and_text(self):
+    def test_lesson_error_preserves_teacher_described_context(self):
         browser=client(app.app)
         with browser.session_transaction() as session:session['prompt']='prompt3'
-        response=browser.post('/home',data={'topic':'Plants','grade_level':'99','number_of_students':'25','number_of_words':'500','culture_group':['Black','Latino'],'ell':'True'})
+        response=browser.post('/home',data={'topic':'Plants','grade_level':'99','number_of_students':'25','number_of_words':'500','prior_knowledge':'Students know plant parts.','learner_supports':'Use labeled diagrams.'})
         self.assertEqual(response.status_code,400)
         soup=BeautifulSoup(response.data,'html.parser')
         self.assertEqual(soup.select_one('[name=topic]')['value'],'Plants')
         self.assertEqual(soup.select_one('[name=grade_level]')['value'],'99')
-        self.assertEqual(len(soup.select('[name=culture_group][checked]')),2)
-        self.assertIsNotNone(soup.select_one('[name=ell][checked]'))
+        self.assertEqual(soup.select_one('[name=prior_knowledge]').text,'Students know plant parts.')
+        self.assertEqual(soup.select_one('[name=learner_supports]').text,'Use labeled diagrams.')

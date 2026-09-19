@@ -24,7 +24,7 @@ class AppRouteTests(unittest.TestCase):
         response = self.client.post("/prompt_selection", data={"prompt": "prompt99"})
         self.assertEqual(response.status_code, 400)
 
-    def test_multiple_cultures_are_preserved(self):
+    def test_teacher_described_context_is_preserved(self):
         with self.client.session_transaction() as browser_session:
             browser_session["prompt"] = "prompt3"
 
@@ -35,19 +35,17 @@ class AppRouteTests(unittest.TestCase):
                 "number_of_words": "500",
                 "grade_level": "5",
                 "number_of_students": "25",
-                "culture_group": ["Black", "Latino"],
-                "socioeconomic_level": "Medium",
-                "experiential_type": "Mixed",
+                "prior_knowledge": "Students can label a plant cell.",
+                "learner_supports": "Use diagrams and read directions aloud.",
                 "state": "Arizona",
-                "disabled": "True",
             },
         )
         self.assertEqual(response.status_code, 302)
         with self.client.session_transaction() as browser_session:
-            self.assertEqual(
-                browser_session["input_data"]["culture_group"], ["Black", "Latino"]
-            )
-            self.assertTrue(browser_session["input_data"]["disabled"])
+            saved = browser_session["input_data"]
+            self.assertEqual(saved["prior_knowledge"], "Students can label a plant cell.")
+            self.assertEqual(saved["learner_supports"], "Use diagrams and read directions aloud.")
+            self.assertNotIn("culture_group", saved)
 
     @patch("app.lesson_planner.generate_lesson_plan")
     def test_output_reuses_generated_lesson(self, mock_generate):

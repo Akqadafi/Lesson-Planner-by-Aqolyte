@@ -25,7 +25,7 @@ class OutputContractTests(unittest.TestCase):
 
     @patch('lesson_planner.generate_text')
     def test_invalid_legacy_context_never_calls_ai(self, model):
-        for changes in ({'state':'x'*301},{'culture_group':[None]},{'culture_group':['x']*21},{'prompt':'bad'},{'prompt':'prompt1','lesson_type':' '},{'topic':None}):
+        for changes in ({'state':'x'*301},{'prior_knowledge':'x'*4001},{'learner_supports':'x'*4001},{'prompt':'bad'},{'prompt':'prompt1','lesson_type':' '},{'topic':None}):
             with self.assertRaises(ValueError):lesson_planner.generate_lesson_plan(dict(SAMPLE_INPUT,**changes))
         model.assert_not_called()
 

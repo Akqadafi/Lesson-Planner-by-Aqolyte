@@ -13,6 +13,10 @@ All notable changes to LPAPP are recorded here. The project uses
   company-to-product path so the direct Lesson Planner launch appears only on Products
 - Restyled worksheet setup, generation confirmation, error, and result screens with the
   Lesson Planner application theme and removed the redundant self-link from its header
+- Added dedicated prior-knowledge context to the modular studio and all six legacy lesson
+  formats, with server-side length validation and prompt integration
+- Replaced broad demographic classifications with optional teacher-described learner support
+  and restricted saved legacy submissions to the supported lesson fields
 
 ### Planned
 

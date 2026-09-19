@@ -223,10 +223,13 @@ def prompt_selection():
 @app.route("/home", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
-        input_data = request.form.to_dict()
-        input_data["culture_group"] = request.form.getlist("culture_group")
-        for field in ("disabled", "ell", "gifted"):
-            input_data[field] = field in request.form
+        input_data = {
+            field: request.form.get(field, "")
+            for field in (
+                "topic", "number_of_words", "grade_level", "number_of_students",
+                "prior_knowledge", "learner_supports", "state", "lesson_type",
+            )
+        }
         input_data["prompt"] = session.get("prompt")
         if input_data["prompt"] not in lesson_planner.SECTION_ORDER:
             return redirect(url_for("prompt_selection"))
