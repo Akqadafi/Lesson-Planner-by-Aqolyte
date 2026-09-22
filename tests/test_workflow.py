@@ -20,7 +20,13 @@ class WorkflowTests(unittest.TestCase):
             data.update(values)
             return browser.post(path,data=data)
         self.assertEqual(submit('/builder/','create',mode='scratch',preset='prompt1',topic='Fractions',grade='5',students='25',minutes='40',sessions='1',delivery='classroom',sections=['activities']).status_code,302)
-        self.assertEqual(submit('/builder/','save',content_activities='Compare fraction strips.').status_code,302)
+        activity={'activity_activities_session':'1','activity_activities_minutes':'20','activity_activities_transition_minutes':'2',
+            'activity_activities_objective':'Compare fractions.','activity_activities_grouping':'Pairs',
+            'activity_activities_materials':'Fraction strips','activity_activities_teacher_steps':'Model one comparison.',
+            'activity_activities_student_directions':'Compare two fractions and explain.',
+            'activity_activities_assessment':'Check each comparison and explanation.',
+            'activity_activities_supports_extensions':'Provide a visual model and an extension problem.'}
+        self.assertEqual(submit('/builder/','save',**activity).status_code,302)
         self.assertEqual(submit('/builder/','review').status_code,302)
         lesson=submit('/builder/','export')
         self.assertIn('Teacher reviewed','\n'.join(p.text for p in Document(BytesIO(lesson.data)).paragraphs))
@@ -31,7 +37,8 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(response.status_code,200)
             text='\n'.join(p.text for p in Document(BytesIO(response.data)).paragraphs)
             self.assertEqual('TEACHER_ONLY' in text,teacher)
-        self.assertEqual(submit('/builder/','save',content_activities='Compare fraction strips and explain.').status_code,302)
+        activity['activity_activities_teacher_steps']='Model one comparison and ask students to explain.'
+        self.assertEqual(submit('/builder/','save',**activity).status_code,302)
         self.assertEqual(submit('/handouts/','student').status_code,400)
         self.assertEqual(submit('/handouts/','confirm').status_code,302)
         self.assertEqual(submit('/handouts/','student').status_code,200)

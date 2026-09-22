@@ -17,6 +17,10 @@ All notable changes to LPAPP are recorded here. The project uses
   formats, with server-side length validation and prompt integration
 - Replaced broad demographic classifications with optional teacher-described learner support
   and restricted saved legacy submissions to the supported lesson fields
+- Added validated structured activity fields for objectives, session assignment, instruction and
+  transition time, grouping, materials, teacher steps, student directions, assessment, and supports
+- Added per-session timing summaries that flag overbooked plans and prevent teacher-review status
+  until structured activities are complete and fit within the configured session limits
 
 ### Planned
 

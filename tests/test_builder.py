@@ -12,6 +12,21 @@ from openai_service import GenerationUnavailableError
 from bs4 import BeautifulSoup
 from docx import Document
 
+def activity_record(session=1, minutes=20, transition=2, objective='Compare fractions.'):
+    return {'session':session,'minutes':minutes,'transition_minutes':transition,
+        'objective':objective,'grouping':'Pairs','materials':['Fraction strips'],
+        'teacher_steps':['Model one comparison.'],'student_directions':['Compare two fractions.'],
+        'assessment':'Listen for a correct comparison and explanation.',
+        'supports_extensions':'Provide a visual model and an extension problem.'}
+
+def activity_form(section='activities', session=1, minutes=20, transition=2, teacher_steps='Model one comparison.'):
+    prefix=f'activity_{section}_'
+    return {prefix+'session':str(session),prefix+'minutes':str(minutes),prefix+'transition_minutes':str(transition),
+        prefix+'objective':'Compare fractions.',prefix+'grouping':'Pairs',prefix+'materials':'Fraction strips',
+        prefix+'teacher_steps':teacher_steps,prefix+'student_directions':'Compare two fractions.',
+        prefix+'assessment':'Listen for a correct comparison and explanation.',
+        prefix+'supports_extensions':'Provide a visual model and an extension problem.'}
+
 class BuilderTests(unittest.TestCase):
     def setUp(self):
         app.app.config.update(TESTING=True)
@@ -85,6 +100,44 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(context['prior_knowledge'],prior)
         self.assertEqual(context['supports'],supports)
     @patch('builder.generate_text')
+    def test_generated_activity_contract_and_multisession_timing(self,mock):
+        self.create(mode='scratch',sections=['warmup','guided'],minutes='30',sessions='2')
+        mock.return_value=json.dumps({'sections':[
+            {'id':'warmup','activity':activity_record(session=1,minutes=12,transition=3,objective='Recall equivalent fractions.')},
+            {'id':'guided','activity':activity_record(session=2,minutes=20,transition=2)},
+        ]})
+        self.assertEqual(self.post('generate').status_code,302)
+        draft=self.state()['builder_draft']
+        self.assertEqual(draft['sections'][0]['activity']['minutes'],12)
+        self.assertIn('Teacher steps:',draft['sections'][0]['content'])
+        timing=builder.timing_summary(draft)
+        self.assertEqual([(row['scheduled'],row['over']) for row in timing['rows']],[(15,0),(22,0)])
+        page=self.client.get('/builder/')
+        self.assertIn(b'12 instruction + 3 transition = 15 of 30 minutes',page.data)
+
+    @patch('builder.generate_text')
+    def test_invalid_generated_activity_preserves_draft(self,mock):
+        self.create(mode='scratch',sections=['activities'])
+        old=self.state()['builder_draft']
+        incomplete=activity_record();incomplete.pop('assessment')
+        for activity in (incomplete,activity_record(session=2),dict(activity_record(),unexpected='x')):
+            mock.return_value=json.dumps({'sections':[{'id':'activities','activity':activity}]})
+            self.assertEqual(self.post('generate').status_code,400)
+            self.assertEqual(self.state()['builder_draft'],old)
+
+    def test_manual_activity_timing_blocks_overbooked_review(self):
+        self.create(mode='scratch',sections=['warmup','guided'],minutes='40',sessions='1')
+        values={**activity_form('warmup',minutes=25,transition=2),
+                **activity_form('guided',minutes=25,transition=2)}
+        self.assertEqual(self.post('save',**values).status_code,302)
+        page=self.client.get('/builder/')
+        self.assertIn(b'Session 1 is overbooked by 14 minutes',page.data)
+        self.assertEqual(self.post('review').status_code,400)
+        values={**activity_form('warmup',minutes=15,transition=2),
+                **activity_form('guided',minutes=15,transition=2)}
+        self.assertEqual(self.post('save',**values).status_code,302)
+        self.assertEqual(self.post('review').status_code,302)
+    @patch('builder.generate_text')
     def test_section_regeneration_preserves_other_content_and_resets_review(self,mock):
         self.create(mode='scratch',sections=['worksheet','answers'])
         self.post('save',content_worksheet='Question',content_answers='Answer')
@@ -152,7 +205,9 @@ class BuilderTests(unittest.TestCase):
         self.create(mode='scratch',sections=['overview','activities','assessment'])
         content='\n'.join(f'Step {i}: '+('detail ' * 70) for i in range(1,41))
         final='FINAL EXPORT MARKER'
-        self.assertEqual(self.post('save',content_overview=content,content_activities=content,content_assessment=content+'\n'+final).status_code,302)
+        values={'content_overview':content,'content_assessment':content+'\n'+final,
+                **activity_form(teacher_steps=content,minutes=30,transition=3)}
+        self.assertEqual(self.post('save',**values).status_code,302)
         exported=self.post('export')
         self.assertEqual(exported.status_code,200)
         doc=Document(BytesIO(exported.data));text='\n'.join(p.text for p in doc.paragraphs)

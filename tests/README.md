@@ -19,10 +19,11 @@ mocked AI responses and made no paid API calls. It covers every generation entry
 provider-failure recovery, the audited route/asset surface, and long lesson and 20-item
 student/teacher handout exports.
 
-The active `codex/ui-navigation-redesign` branch has 91 passing offline tests. New coverage
-checks dedicated prior-knowledge prompt context, teacher-described learner support, field
-limits, error recovery, removal of broad demographic controls, and supported-field storage.
-The corporate and application redesign remains separate from the `v0.2.1` release on `main`.
+The active `codex/ui-navigation-redesign` branch has 94 passing offline tests. Coverage now
+includes dedicated prior-knowledge context, teacher-described learner support, strict generated
+activity records, manual structured-activity editing, multi-session instruction/transition totals,
+overbooking review blocks, exports, and downstream handout invalidation. The branch remains
+separate from the `v0.2.1` release on `main`.
 
 The separate synthetic integration artifacts are stored in
 `../../lesson-export-qa/milestone1-closure`. The installed Microsoft Word converter produced a
