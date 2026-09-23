@@ -2,7 +2,7 @@ name: LPAPP CI
 
 on:
   push:
-    branches: [main, codex/modular-lesson-builder]
+    branches: [main, codex/modular-lesson-builder, codex/ui-navigation-redesign]
   pull_request:
 
 permissions:
