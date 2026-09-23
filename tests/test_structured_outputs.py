@@ -40,6 +40,14 @@ class StructuredOutputTests(unittest.TestCase):
         self.assertIn('type', mixed['properties']['questions']['items']['required'])
         regular = worksheet_schema(3)
         self.assertNotIn('type', regular['properties']['questions']['items']['properties'])
+        linked = lesson_sections_schema(['worksheet', 'answers'])
+        variants = linked['properties']['sections']['items']['anyOf']
+        worksheet = next(item for item in variants if item['properties']['id']['enum'] == ['worksheet'])
+        answers = next(item for item in variants if item['properties']['id']['enum'] == ['answers'])
+        self.assertEqual(set(worksheet['properties']['items']['items']['required']), {'id', 'prompt'})
+        self.assertEqual(set(answers['properties']['items']['items']['required']), {'question_id', 'answer'})
+        self.assertEqual(worksheet['properties']['items']['items']['properties']['id']['type'], 'integer')
+        self.assertEqual(answers['properties']['items']['items']['properties']['question_id']['type'], 'integer')
 
     @patch('openai_service.reserve_attempt')
     @patch('openai_service.get_client')

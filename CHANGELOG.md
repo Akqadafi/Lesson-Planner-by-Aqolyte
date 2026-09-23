@@ -25,6 +25,10 @@ All notable changes to LPAPP are recorded here. The project uses
   and worksheets and supplied them through the Responses API Structured Outputs boundary
 - Retained application-side checks for exact identifiers, ordering, timing, answer separation,
   content limits, and type-specific worksheet rules after schema-constrained generation
+- Added stable consecutive numeric identifiers to modular exercises and explicit answer links;
+  mismatched counts, missing links, duplicates, and nonconsecutive identifiers preserve the prior draft
+- Regenerating modular exercises or their teacher key now refreshes the linked pair together while
+  preserving unrelated lesson sections
 
 ### Planned
 

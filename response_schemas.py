@@ -18,6 +18,10 @@ def _fixed_array(items, count):
     return {"type": "array", "items": items, "minItems": count, "maxItems": count}
 
 
+def _bounded_array(items, minimum=1, maximum=50):
+    return {"type": "array", "items": items, "minItems": minimum, "maxItems": maximum}
+
+
 def _text(description):
     return {"type": "string", "description": description}
 
@@ -39,11 +43,22 @@ def _activity():
 
 def lesson_sections_schema(section_ids, activity_ids=()):
     activity_ids = set(activity_ids)
+    linked_questions = {'worksheet', 'answers'}.issubset(section_ids)
     variants = []
     for section_id in section_ids:
         properties = {"id": {"type": "string", "enum": [section_id]}}
         if section_id in activity_ids:
             properties["activity"] = _activity()
+        elif linked_questions and section_id == 'worksheet':
+            properties["items"] = _bounded_array(_object({
+                "id": {"type": "integer", "description": "Stable consecutive one-based identifier."},
+                "prompt": _text("Complete student-facing question or exercise."),
+            }))
+        elif linked_questions and section_id == 'answers':
+            properties["items"] = _bounded_array(_object({
+                "question_id": {"type": "integer", "description": "Identifier of the matching student exercise."},
+                "answer": _text("Teacher answer, explanation, or scoring guidance."),
+            }))
         else:
             properties["content"] = _text("Complete plain-text content for this lesson section.")
         variants.append(_object(properties))

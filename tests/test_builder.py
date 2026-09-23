@@ -73,10 +73,21 @@ class BuilderTests(unittest.TestCase):
     @patch('builder.generate_text')
     def test_generation_and_failure_are_atomic(self,mock):
         self.create(mode='scratch',sections=['worksheet','answers'])
-        mock.return_value=json.dumps({'sections':[{'id':'worksheet','content':'1. 2+2?'},{'id':'answers','content':'1. 4'}]})
+        mock.return_value=json.dumps({'sections':[
+            {'id':'worksheet','items':[{'id':1,'prompt':'2+2?'}]},
+            {'id':'answers','items':[{'question_id':1,'answer':'4'}]},
+        ]})
         self.assertEqual(self.post('generate').status_code,302)
+        generated=self.state()['builder_draft']['sections']
+        self.assertEqual(generated[0]['content'],'1. 2+2?')
+        self.assertEqual(generated[1]['items'][0]['question_id'],1)
         old=self.state()['builder_draft']
-        for payload in ('bad json',json.dumps({'sections':[{'id':'worksheet','content':'Partial'}]}),json.dumps({'sections':[{'id':'worksheet','content':'x'},{'id':'worksheet','content':'x'}]})):
+        for payload in ('bad json',
+                json.dumps({'sections':[{'id':'worksheet','items':[{'id':1,'prompt':'Partial'}]}]}),
+                json.dumps({'sections':[{'id':'worksheet','items':[{'id':1,'prompt':'Q'}]},
+                    {'id':'answers','items':[{'question_id':2,'answer':'A'}]}]}),
+                json.dumps({'sections':[{'id':'worksheet','items':[{'id':1,'prompt':'Q'}]},
+                    {'id':'worksheet','items':[{'id':1,'prompt':'Q'}]}]})):
             mock.return_value=payload
             self.assertEqual(self.post('generate').status_code,400)
             self.assertEqual(self.state()['builder_draft'],old)
@@ -140,15 +151,37 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(self.post('save',**values).status_code,302)
         self.assertEqual(self.post('review').status_code,302)
     @patch('builder.generate_text')
-    def test_section_regeneration_preserves_other_content_and_resets_review(self,mock):
-        self.create(mode='scratch',sections=['worksheet','answers'])
-        self.post('save',content_worksheet='Question',content_answers='Answer')
+    def test_question_regeneration_keeps_answer_links_and_other_content(self,mock):
+        self.create(mode='scratch',sections=['worksheet','answers','assessment'])
+        self.post('save',content_worksheet='Question',content_answers='Answer',content_assessment='Exit ticket')
         self.post('review')
-        mock.return_value=json.dumps({'sections':[{'id':'worksheet','content':'New question'}]})
+        mock.return_value=json.dumps({'sections':[
+            {'id':'worksheet','items':[{'id':1,'prompt':'New question'}]},
+            {'id':'answers','items':[{'question_id':1,'answer':'New answer'}]},
+        ]})
         self.assertEqual(self.post('regenerate',section='worksheet').status_code,302)
         d=self.state()['builder_draft']
-        self.assertEqual(d['sections'][1]['content'],'Answer')
+        self.assertEqual(d['sections'][0]['content'],'1. New question')
+        self.assertEqual(d['sections'][1]['content'],'1. New answer')
+        self.assertEqual(d['sections'][2]['content'],'Exit ticket')
         self.assertFalse(d['reviewed'])
+        context=json.loads(mock.call_args.args[0][1]['content'])
+        self.assertEqual([row['id'] for row in context['requested_sections']],['worksheet','answers'])
+    @patch('builder.generate_text')
+    def test_manual_question_edit_invalidates_machine_checked_links(self,mock):
+        self.create(mode='scratch',sections=['worksheet','answers'])
+        mock.return_value=json.dumps({'sections':[
+            {'id':'worksheet','items':[{'id':1,'prompt':'Original question'}]},
+            {'id':'answers','items':[{'question_id':1,'answer':'Original answer'}]},
+        ]})
+        self.assertEqual(self.post('generate').status_code,302)
+        self.assertEqual(self.post('save',content_worksheet='Teacher-edited question',
+                                   content_answers='1. Original answer').status_code,302)
+        rows=self.state()['builder_draft']['sections']
+        self.assertTrue(all('items' not in row for row in rows))
+        self.assertIn(b'Question-to-answer links are not machine-checked after manual edits',
+                      self.client.get('/builder/').data)
+
     def test_reorder_remove_add_edit_export(self):
         self.create(mode='scratch',sections=['worksheet','answers'])
         self.post('save',content_worksheet='Question\nSecond line',content_answers='Answer')
