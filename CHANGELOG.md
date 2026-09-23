@@ -29,10 +29,16 @@ All notable changes to LPAPP are recorded here. The project uses
   mismatched counts, missing links, duplicates, and nonconsecutive identifiers preserve the prior draft
 - Regenerating modular exercises or their teacher key now refreshes the linked pair together while
   preserving unrelated lesson sections
+- Added a browser-isolated lesson library with explicit saved/unsaved state and save, reopen,
+  rename, and delete controls; the accountless prototype retains up to 25 lessons and expires
+  lessons after 90 days of inactivity
+- Added up to 20 recovery snapshots per lesson, including an automatic snapshot of unsaved edits
+  immediately before full-plan or section-level AI generation; restoring a snapshot opens it as an
+  unsaved draft and leaves the current saved copy intact
 
 ### Planned
 
-- Persistent teacher accounts and saved lesson libraries
+- Optional teacher accounts and shared or cloud-synchronized lesson libraries
 - Independent standards retrieval and factual-content verification
 - Distributed request coordination and production deployment controls
 - Structured evaluation with teacher feedback

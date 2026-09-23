@@ -9,6 +9,7 @@ from pdf_export import convert_docx, PDFExportError
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_file
 from openai_service import generate_text, GenerationUnavailableError
 from response_schemas import lesson_sections_schema
+from lesson_store import checkpoint_plan, draft_digest
 
 bp = Blueprint('builder', __name__, url_prefix='/builder')
 MODULES = {
@@ -354,11 +355,25 @@ def display_draft(draft):
     return result
 
 
+def checkpoint_before_generation(draft):
+    plan_id = session.get('library_plan_id')
+    owner = session.get('lesson_library_owner')
+    if plan_id and owner:
+        checkpoint_plan(owner, plan_id, draft)
+
+
 def page(error=None, status=200, values=None, selected=None):
     stored = session.get('builder_draft')
     draft = display_draft(stored)
+    library = None
+    if stored:
+        library = {
+            'plan_id': session.get('library_plan_id'),
+            'name': session.get('library_plan_name') or stored['config']['topic'],
+            'saved': bool(session.get('library_plan_id')) and session.get('library_saved_digest') == draft_digest(stored),
+        }
     return render_template('builder.html', presets=PRESETS, modules=MODULES, delivery=DELIVERY,
-        activity_modules=ACTIVITY_MODULES, token=csrf(), draft=draft,
+        activity_modules=ACTIVITY_MODULES, token=csrf(), draft=draft, library=library,
         notices=checks(stored) if stored else [], timing=timing_summary(stored) if stored else None,
         error=error, values=values or {}, selected=selected), status
 
@@ -375,11 +390,14 @@ def index():
             config = configuration(request.form, request.form.getlist('sections'))
             session['builder_draft'] = {'config':config, 'sections':[new_row(i) for i in config['sections']],
                                         'revision':secrets.token_hex(12), 'reviewed':False}
+            for key in ('library_plan_id', 'library_plan_name', 'library_saved_digest'):
+                session.pop(key, None)
         else:
             draft = copy.deepcopy(session.get('builder_draft'))
             if not draft or request.form.get('revision') != draft['revision']:
                 raise ValueError('This draft changed in another tab. Reload before editing.')
             if action == 'generate':
+                checkpoint_before_generation(draft)
                 rows = draft_sections(draft['config'], [r['id'] for r in draft['sections']], draft['sections'])
                 draft['sections'] = rows
             elif action == 'regenerate':
@@ -390,6 +408,7 @@ def index():
                 targets = [key]
                 if key in {'worksheet', 'answers'} and {'worksheet', 'answers'}.issubset(existing_ids):
                     targets = [item for item in existing_ids if item in {'worksheet', 'answers'}]
+                checkpoint_before_generation(draft)
                 replacements = {row['id']: row for row in draft_sections(draft['config'], targets, draft['sections'])}
                 draft['sections'] = [replacements.get(r['id'], r) for r in draft['sections']]
             elif action == 'save':

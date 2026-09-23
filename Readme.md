@@ -9,6 +9,7 @@ LPAPP is a Flask application that uses OpenAI to generate classroom lesson plans
 - Short-answer, fill-in-the-blank, matching, mixed, and multiple-choice worksheets
 - In-memory Word document export
 - Server-side sessions so generated content is not stored in browser cookies
+- A browser-isolated local lesson library with saved/unsaved state and recovery snapshots
 
 ## Local setup
 
@@ -41,8 +42,8 @@ Tests mock the OpenAI boundary and do not make network requests:
 python -m unittest discover -s tests -v
 ```
 
-GitHub Actions runs the same offline suite on pull requests and pushes to `main` or
-`codex/modular-lesson-builder`. The workflow supplies placeholders rather than real API
+GitHub Actions runs the same offline suite on pull requests and pushes to `main`,
+`codex/modular-lesson-builder`, or `codex/ui-navigation-redesign`. The workflow supplies placeholders rather than real API
 credentials, grants read-only repository access, cancels superseded runs, and does not
 deploy the application. PDF route tests mock conversion; production converter checks remain
 separate from CI.
@@ -75,9 +76,17 @@ learning are delivery options across approaches.
 4. Review factual claims, standards, activities, exercise answers and timing.
 5. Mark the draft teacher-reviewed and download Word. Any change clears that status.
 
-Only one modular draft is stored in the browser's server-side session; this is not a
-permanent lesson library. Download before replacing it. Separate tabs share the draft;
-stale submissions are rejected. Opening legacy worksheets preserves the modular draft.
+The current modular draft is stored in the browser's server-side session. Use **Save to library**
+to retain it in local SQLite storage, reopen it later, rename or delete it, and inspect recovery
+versions. Separate tabs share the current draft; stale submissions are rejected. Opening legacy
+worksheets preserves the modular draft.
+
+The accountless library uses an opaque owner identifier stored in the browser's signed session.
+Every read and mutation is scoped to that identifier. It retains up to 25 lessons, 20 snapshots
+per lesson, and removes lessons after 90 days without a save. Full-plan and section-level AI
+generation first snapshots any unsaved edits. Restoring a snapshot opens it as an unsaved draft,
+so the current saved copy remains available until the teacher explicitly saves. Clearing site data
+can remove access to this local library; Word and PDF exports remain the portable backup.
 
 ### What checks mean
 
@@ -92,8 +101,8 @@ verified. Prompt instructions request evidence and uncertainty labels but do not
 compliance. Teacher review is an acknowledgement, not certification. Independent retrieval,
 claim verification and mathematical answer validation remain future work.
 
-The app is a local prototype: it has no authentication, persistent user library, deployment
-rate limits, or independent educational-quality evaluation. Do not expose its paid generation
+The app is a local prototype: it has no authentication, cross-device library, deployment rate
+limits, or independent educational-quality evaluation. Do not expose its paid generation
 routes publicly without access and usage controls. Do not enter student identifying records.
 
 Tests use mocked AI responses. Real-model output quality must be evaluated separately.
@@ -110,7 +119,8 @@ check that prompts themselves do not reveal answers. All content remains unverif
 
 A lesson content/configuration change flags the handout and pauses export until the teacher
 regenerates it or acknowledges reviewing its alignment. One worksheet is stored within
-the current session draft; starting a new lesson replaces it. Durable storage and image uploads remain pending. Automatic PDF downloads require a configured converter (see below).
+the current session draft; starting a new lesson replaces it. Handouts are not yet stored as
+independent library records, and image uploads remain pending. Automatic PDF downloads require a configured converter (see below).
 No additional graphics packages are required for this initial text-based workflow.
 
 

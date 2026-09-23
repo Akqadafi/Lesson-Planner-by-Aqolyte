@@ -46,7 +46,7 @@ class WorkflowTests(unittest.TestCase):
     def test_local_navigation_and_assets(self):
         browser=app.app.test_client()
         seen=set()
-        for path in ('/','/about','/products','/features','/contact','/choose','/second_landing','/builder/','/worksheet','/output'):
+        for path in ('/','/about','/products','/features','/contact','/choose','/second_landing','/builder/','/library/','/worksheet','/output'):
             response=browser.get(path,follow_redirects=True)
             self.assertEqual(response.status_code,200,path)
             for node in BeautifulSoup(response.data,'html.parser').select('a[href],link[href],script[src],img[src]'):

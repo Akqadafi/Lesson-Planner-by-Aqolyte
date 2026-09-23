@@ -1,6 +1,7 @@
 import logging
 import secrets
 import os
+from datetime import timedelta
 from io import BytesIO
 from pdf_export import convert_docx, PDFExportError
 from pathlib import Path
@@ -14,6 +15,7 @@ from request_guard import SessionRequestGuard
 from openai_service import GenerationUnavailableError
 from handouts import bp as handouts_blueprint
 from builder import bp as builder_blueprint, csrf
+from library import bp as library_blueprint
 
 import lesson_planner
 from worksheet_generator import generate_worksheet, WorksheetFormatError
@@ -38,6 +40,7 @@ app.config.update(
     SESSION_TYPE="filesystem",
     SESSION_FILE_DIR=str(BASE_DIR / "instance" / "sessions"),
     SESSION_PERMANENT=False,
+    PERMANENT_SESSION_LIFETIME=timedelta(days=90),
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true",
@@ -48,6 +51,7 @@ Session(app)
 app.wsgi_app = SessionRequestGuard(app.wsgi_app, app.config["SESSION_COOKIE_NAME"])
 app.register_blueprint(builder_blueprint)
 app.register_blueprint(handouts_blueprint)
+app.register_blueprint(library_blueprint)
 
 
 @app.context_processor
@@ -192,7 +196,11 @@ def choose():
 
 @app.route("/clear_cache", methods=["POST"])
 def clear_cache():
+    library_owner = session.get('lesson_library_owner')
     session.clear()
+    if library_owner:
+        session['lesson_library_owner'] = library_owner
+        session.permanent = True
     return redirect(url_for("landing"))
 
 

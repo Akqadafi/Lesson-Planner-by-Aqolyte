@@ -11,6 +11,10 @@ class SurfaceAuditTests(unittest.TestCase):
             '/choose': {'GET'}, '/clear_cache': {'POST'}, '/contact': {'GET'},
             '/design-options/': {'GET'}, '/design-options/<option>': {'GET'},
             '/features': {'GET'}, '/handouts/': {'GET','POST'}, '/health': {'GET'},
+            '/library/': {'GET'}, '/library/save': {'POST'},
+            '/library/<plan_id>': {'GET'}, '/library/<plan_id>/delete': {'POST'},
+            '/library/<plan_id>/open': {'POST'}, '/library/<plan_id>/rename': {'POST'},
+            '/library/<plan_id>/versions/<int:version_id>/restore': {'POST'},
             '/home': {'GET','POST'}, '/output': {'GET','POST'}, '/products': {'GET'},
             '/prompt_selection': {'GET','POST'}, '/redirect_choice': {'POST'},
             '/second_landing': {'GET'}, '/version': {'GET'}, '/worksheet': {'GET','POST'},
@@ -26,7 +30,7 @@ class SurfaceAuditTests(unittest.TestCase):
         templates = {path.relative_to(root/'templates').as_posix() for path in (root/'templates').rglob('*') if path.is_file()}
         expected_templates = {
             'about.html','builder.html','choose.html','contact.html','features.html',
-            'corporate_base.html','design_options.html','generation_error.html','generation_ready.html','handouts.html','home.html',
+            'corporate_base.html','design_options.html','generation_error.html','generation_ready.html','handouts.html','home.html','library.html',
             'landing.html','products.html','prompt0_form.html','prompt1_form.html',
             'prompt2_form.html','prompt3_form.html','prompt4_form.html','prompt5_form.html',
             'second_landing.html','unit_plan.html','worksheet_display.html','worksheet_input_form.html',
@@ -76,6 +80,7 @@ class SurfaceAuditTests(unittest.TestCase):
         self.assertEqual(lesson.status_code, 200)
         self.assertNotIn(b'>Lesson studio</a>', lesson.data)
         self.assertEqual(lesson.data.count(b'href="/worksheet"'), 1)
+        self.assertEqual(lesson.data.count(b'href="/library/"'), 1)
 
         setup = client.get('/worksheet')
         self.assertEqual(setup.status_code, 200)
