@@ -1,7 +1,9 @@
+import json
 import re
 from legacy_choices import CHOICES
 
 from openai_service import generate_text
+from response_schemas import legacy_lesson_schema
 
 
 SECTION_ORDER = {
@@ -47,6 +49,31 @@ def parse_lesson_plan(lesson_plan_text: str, expected_sections=None) -> dict[str
             raise LessonFormatError(message)
         return {name: sections[name] for name in expected_sections}
     return sections
+
+
+def parse_structured_lesson(lesson_plan_text: str, expected_sections) -> dict[str, str]:
+    message = 'The generated lesson was incomplete or incorrectly formatted. Please retry; your inputs have been kept.'
+    try:
+        payload = json.loads(lesson_plan_text)
+        if not isinstance(payload, dict) or set(payload) != {'sections'}:
+            raise ValueError()
+        rows = payload['sections']
+        if not isinstance(rows, list) or len(rows) != len(expected_sections):
+            raise ValueError()
+        sections = {}
+        for row in rows:
+            if not isinstance(row, dict) or set(row) != {'title', 'content'}:
+                raise ValueError()
+            title, content = row['title'], row['content']
+            if (title not in expected_sections or title in sections or not isinstance(content, str)
+                    or not content.strip() or len(content) > 30000):
+                raise ValueError()
+            sections[title] = content.strip()
+        if set(sections) != set(expected_sections):
+            raise ValueError()
+        return {name: sections[name] for name in expected_sections}
+    except (ValueError, TypeError, KeyError, json.JSONDecodeError):
+        raise LessonFormatError(message) from None
 
 
 def get_samr_definition() -> str:
@@ -133,9 +160,7 @@ def generate_lesson_plan(input_data: dict) -> tuple[dict[str, str], list[str]]:
         raise ValueError(f"Invalid prompt selected: {prompt_type}")
 
     ordered_sections = SECTION_ORDER[prompt_type]
-    output_format = "\n\n".join(
-        f"Section: {section}\nContent: <detailed content>" for section in ordered_sections
-    )
+    output_format = ", ".join(ordered_sections)
 
     prompt = f"""
 You are an education specialist. {_lesson_blueprint(input_data)}
@@ -153,7 +178,7 @@ Class context:
 - Teacher-described learner support: {input_data.get('learner_supports') or 'not specified'}
 - Requested state (standards are not retrieved or verified): {input_data.get('state') or 'not specified'}
 
-Return only the following section format. Preserve each section title exactly:
+Return one complete JSON section for each of these titles, preserving every title exactly:
 {output_format}
 """.strip()
 
@@ -161,7 +186,9 @@ Return only the following section format. Preserve each section title exactly:
         [
             {"role": "system", "content": "You create practical, inclusive K-12 instructional materials."},
             {"role": "user", "content": prompt},
-        ]
+        ],
+        response_schema=legacy_lesson_schema(ordered_sections),
+        schema_name='legacy_lesson_plan',
     )
-    ordered_plan = parse_lesson_plan(generated, ordered_sections)
+    ordered_plan = parse_structured_lesson(generated, ordered_sections)
     return ordered_plan, ordered_sections

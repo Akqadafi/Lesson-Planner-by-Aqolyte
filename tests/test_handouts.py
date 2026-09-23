@@ -67,6 +67,8 @@ class HandoutTests(unittest.TestCase):
         mock.return_value=json.dumps({'title':'Fractions','instructions':'Compare','questions':[{'id':1,'prompt':'Q1','answer':'A1'},{'id':2,'prompt':'Q2','answer':'A2'}]})
         self.assertEqual(self.post('generate').status_code,302)
         context=json.loads(mock.call_args.args[0][1]['content']);self.assertEqual(context['grade'],5)
+        self.assertEqual(mock.call_args.kwargs['schema_name'],'lesson_handout')
+        self.assertEqual(mock.call_args.kwargs['response_schema']['properties']['questions']['maxItems'],2)
         self.assertIn('Compare one half',context['source']['content'])
     def test_invalid_edit_retains_submitted_text_and_saved_content(self):
         self.create();self.save();old=self.state()['builder_draft']

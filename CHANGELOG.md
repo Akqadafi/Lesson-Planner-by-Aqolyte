@@ -21,6 +21,10 @@ All notable changes to LPAPP are recorded here. The project uses
   transition time, grouping, materials, teacher steps, student directions, assessment, and supports
 - Added per-session timing summaries that flag overbooked plans and prevent teacher-review status
   until structured activities are complete and fit within the configured session limits
+- Added shared strict JSON Schemas for modular lessons, legacy lesson formats, handouts,
+  and worksheets and supplied them through the Responses API Structured Outputs boundary
+- Retained application-side checks for exact identifiers, ordering, timing, answer separation,
+  content limits, and type-specific worksheet rules after schema-constrained generation
 
 ### Planned
 

@@ -8,6 +8,7 @@ from docx import Document
 from pdf_export import convert_docx, PDFExportError
 from flask import Blueprint, render_template, request, session, redirect, url_for, send_file
 from openai_service import generate_text, GenerationUnavailableError
+from response_schemas import lesson_sections_schema
 
 bp = Blueprint('builder', __name__, url_prefix='/builder')
 MODULES = {
@@ -231,8 +232,12 @@ claims and unverified standards "Needs verification". Sources are teacher-suppli
 Without sources label factual material as an unverified draft. Do not claim the lesson is classroom-ready.
 If regenerating a section preserve the rest of the draft; identify dependencies teachers must review.
 Use plain text and numbered steps, not HTML or Markdown tables."""
-    raw = generate_text([{'role':'system','content':instructions},
-                         {'role':'user','content':json.dumps(context, ensure_ascii=False)}])
+    raw = generate_text(
+        [{'role':'system','content':instructions},
+         {'role':'user','content':json.dumps(context, ensure_ascii=False)}],
+        response_schema=lesson_sections_schema(ids, ACTIVITY_MODULES),
+        schema_name='lesson_sections',
+    )
     try:
         result = json.loads(raw)
         rows = result['sections']

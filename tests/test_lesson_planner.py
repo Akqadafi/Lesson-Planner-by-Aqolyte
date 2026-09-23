@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest.mock import patch
 
@@ -31,10 +32,10 @@ class LessonPlannerTests(unittest.TestCase):
 
     @patch("lesson_planner.generate_text")
     def test_generate_lesson_plan_uses_safe_api_boundary(self, mock_generate):
-        mock_generate.return_value = "\n\n".join(
-            f"Section: {name}\nContent: Learn photosynthesis."
+        mock_generate.return_value = json.dumps({'sections': [
+            {'title': name, 'content': 'Learn photosynthesis.'}
             for name in lesson_planner.SECTION_ORDER['prompt3']
-        )
+        ]})
         plan, order = lesson_planner.generate_lesson_plan(SAMPLE_INPUT)
 
         self.assertEqual(plan["Lesson Plan Purpose Statement"], "Learn photosynthesis.")
@@ -44,13 +45,15 @@ class LessonPlannerTests(unittest.TestCase):
         self.assertIn("Students can label the main parts of a plant cell.", prompt)
         self.assertIn("Use diagrams, a vocabulary bank", prompt)
         self.assertNotIn("Cultural groups", prompt)
+        self.assertEqual(mock_generate.call_args.kwargs['schema_name'], 'legacy_lesson_plan')
+        self.assertEqual(mock_generate.call_args.kwargs['response_schema']['type'], 'object')
 
     @patch("lesson_planner.generate_text")
     def test_unsupplied_learning_context_is_marked_not_specified(self, mock_generate):
-        mock_generate.return_value = "\n\n".join(
-            f"Section: {name}\nContent: Ready"
+        mock_generate.return_value = json.dumps({'sections': [
+            {'title': name, 'content': 'Ready'}
             for name in lesson_planner.SECTION_ORDER['prompt3']
-        )
+        ]})
         data = dict(SAMPLE_INPUT, prior_knowledge="", learner_supports="")
         lesson_planner.generate_lesson_plan(data)
         sent_messages = mock_generate.call_args.args[0]

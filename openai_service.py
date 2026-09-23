@@ -1,4 +1,5 @@
 import os
+import re
 from functools import lru_cache
 from generation_limits import reserve_attempt, GenerationLimitError
 
@@ -20,8 +21,10 @@ def get_client() -> OpenAI:
     return OpenAI(api_key=api_key, timeout=90.0, max_retries=0)
 
 
-def generate_text(messages: list[dict[str, str]], *, model: str | None = None) -> str:
-    """Generate text without logging prompts, responses, or credentials."""
+def generate_text(messages: list[dict[str, str]], *, model: str | None = None,
+                  response_schema: dict | None = None,
+                  schema_name: str = "generated_response") -> str:
+    """Generate text, optionally constrained by a strict provider-side JSON Schema."""
     if not isinstance(messages, list) or not messages or any(
         not isinstance(item, dict) or item.get('role') not in {'system', 'user', 'assistant'}
         or not isinstance(item.get('content'), str) for item in messages
@@ -29,18 +32,30 @@ def generate_text(messages: list[dict[str, str]], *, model: str | None = None) -
         raise GenerationUnavailableError('Invalid generation input. Your saved draft is unchanged.')
     if sum(len(item['content']) for item in messages) > 150000:
         raise GenerationUnavailableError('The lesson context is too large. Shorten the source excerpts or sections before generating.')
+    if response_schema is not None:
+        if (not isinstance(response_schema, dict) or response_schema.get('type') != 'object'
+                or not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', schema_name)):
+            raise GenerationUnavailableError('Invalid structured-output configuration. Your saved draft is unchanged.')
     client = get_client()
     try:
         reserve_attempt()
     except GenerationLimitError as exc:
         raise GenerationUnavailableError(str(exc)) from None
     try:
-        response = client.responses.create(
-            model=model or os.getenv("OPENAI_MODEL", DEFAULT_MODEL),
-            input=messages,
-            store=False,
-            max_output_tokens=12000,
-        )
+        request = {
+            'model': model or os.getenv("OPENAI_MODEL", DEFAULT_MODEL),
+            'input': messages,
+            'store': False,
+            'max_output_tokens': 12000,
+        }
+        if response_schema is not None:
+            request['text'] = {'format': {
+                'type': 'json_schema',
+                'name': schema_name,
+                'strict': True,
+                'schema': response_schema,
+            }}
+        response = client.responses.create(**request)
     except AuthenticationError:
         raise GenerationUnavailableError("The API key was not accepted. Update the app's API configuration, then retry. Your saved draft is unchanged.") from None
     except RateLimitError as exc:

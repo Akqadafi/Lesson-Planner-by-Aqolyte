@@ -15,6 +15,8 @@ class MixedAuditTests(unittest.TestCase):
         rows=[{'id':1,'type':'short_answer','question':'Explain','answer':'Explanation'}, {'id':2,'type':'Fill in the Blanks','question':'Fill ___','answer':'Value'}, {'id':3,'type':'matching','question':'L1: One\nL2: Two\nR1: First\nR2: Second','answer':'L1=R1\nL2=R2'}]
         model.return_value=json.dumps({'questions':rows})
         self.assertIn('3. L1:',worksheet.generate_worksheet('Topic',3,'Mix'))
+        self.assertEqual(model.call_args.kwargs['schema_name'],'worksheet_questions')
+        self.assertIn('type',model.call_args.kwargs['response_schema']['properties']['questions']['items']['properties'])
         for field,value in [('type','essay'),('question','No blank')]:
             bad=copy.deepcopy(rows);bad[1][field]=value;model.return_value=json.dumps({'questions':bad})
             with self.assertRaises(worksheet.WorksheetFormatError):worksheet.generate_worksheet('Topic',3,'Mix')

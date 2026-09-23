@@ -97,6 +97,8 @@ class BuilderTests(unittest.TestCase):
         mock.return_value=json.dumps({'sections':[{'id':'objectives','content':'Compare fractions.'}]})
         self.assertEqual(self.post('generate').status_code,302)
         context=json.loads(mock.call_args.args[0][1]['content'])
+        self.assertEqual(mock.call_args.kwargs['schema_name'],'lesson_sections')
+        self.assertEqual(mock.call_args.kwargs['response_schema']['type'],'object')
         self.assertEqual(context['prior_knowledge'],prior)
         self.assertEqual(context['supports'],supports)
     @patch('builder.generate_text')

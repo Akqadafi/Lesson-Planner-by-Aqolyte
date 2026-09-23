@@ -11,6 +11,7 @@ These test files are stored locally alongside the app. They use Python unittest 
 | test_worksheet_generator.py | Worksheet prompting, supported question types and question-count bounds |
 | test_service_errors.py | Provider authentication, credit, rate-limit, timeout, network, API-status, empty, incomplete, and oversized-response handling |
 | test_surface_audit.py | Exact reachable route/method and production template/static-asset inventory |
+| test_structured_outputs.py | Strict shared schemas and the Responses API `text.format` request boundary |
 
 ## Latest result
 
@@ -19,11 +20,11 @@ mocked AI responses and made no paid API calls. It covers every generation entry
 provider-failure recovery, the audited route/asset surface, and long lesson and 20-item
 student/teacher handout exports.
 
-The active `codex/ui-navigation-redesign` branch has 94 passing offline tests. Coverage now
+The active `codex/ui-navigation-redesign` branch has 98 passing offline tests. Coverage now
 includes dedicated prior-knowledge context, teacher-described learner support, strict generated
 activity records, manual structured-activity editing, multi-session instruction/transition totals,
-overbooking review blocks, exports, and downstream handout invalidation. The branch remains
-separate from the `v0.2.1` release on `main`.
+overbooking review blocks, exports, downstream handout invalidation, and Responses API Structured
+Outputs for every generation path. The branch remains separate from the `v0.2.1` release on `main`.
 
 The separate synthetic integration artifacts are stored in
 `../../lesson-export-qa/milestone1-closure`. The installed Microsoft Word converter produced a

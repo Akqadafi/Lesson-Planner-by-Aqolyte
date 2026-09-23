@@ -12,6 +12,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from builder import csrf, MODULES, number
 from openai_service import generate_text, GenerationUnavailableError
+from response_schemas import handout_schema
 
 bp=Blueprint('handouts',__name__,url_prefix='/handouts')
 TYPES = {
@@ -130,7 +131,9 @@ Return only JSON with title, instructions, questions: [{id:1,prompt:"student que
 Use exactly the requested number of questions and consecutive numeric ids starting at 1.
 Keep teacher-only notes out of student fields. For reference sheets, explanations and worked examples belong in student content; for other types keep answer keys in answer fields. Use grade-appropriate language.
 Do not invent sources or standards. Flag uncertain facts in the teacher answer. This is a draft needing teacher review.
-Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}])
+Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}],
+                    response_schema=handout_schema(len(h['questions'])),
+                    schema_name='lesson_handout')
                 try: generated=validate(json.loads(raw),len(h['questions']))
                 except (ValueError,TypeError,KeyError):raise ValueError('Generated exercises were incomplete or malformed. The saved handout is unchanged.') from None
                 h.update(generated);h['source_hash']=fingerprint(draft)

@@ -1,6 +1,7 @@
 import json
 import re
 from openai_service import generate_text
+from response_schemas import worksheet_schema
 
 
 class WorksheetFormatError(ValueError):
@@ -67,7 +68,9 @@ Include all choices or matching columns inside question where needed. Never put 
         [
             {"role": "system", "content": "You create accurate, age-appropriate classroom worksheets."},
             {"role": "user", "content": prompt},
-        ]
+        ],
+        response_schema=worksheet_schema(num_questions, canonical == 'Mix'),
+        schema_name='worksheet_questions',
     )
 
     try:
