@@ -21,13 +21,13 @@ mocked AI responses and made no paid API calls. It covers every generation entry
 provider-failure recovery, the audited route/asset surface, and long lesson and 20-item
 student/teacher handout exports.
 
-The active `codex/ui-navigation-redesign` branch has 106 passing offline tests. Coverage now
+The active `codex/ui-navigation-redesign` branch has 109 passing offline tests. Coverage now
 includes dedicated prior-knowledge context, teacher-described learner support, strict generated
 activity records, manual structured-activity editing, multi-session instruction/transition totals,
 overbooking review blocks, exports, downstream handout invalidation, Responses API Structured
-Outputs, stable numeric identifiers linking modular exercises to teacher answers, and the durable
-browser-isolated lesson library with recovery snapshots. The branch remains separate from the
-`v0.2.1` release on `main`.
+Outputs, stable numeric identifiers linking modular exercises to teacher answers, the durable
+browser-isolated lesson library with recovery snapshots, and source-specific handout dependency
+tracking. The branch remains separate from the `v0.2.1` release on `main`.
 
 The separate synthetic integration artifacts are stored in
 `../../lesson-export-qa/milestone1-closure`. The installed Microsoft Word converter produced a

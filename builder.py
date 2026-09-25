@@ -10,6 +10,7 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 from openai_service import generate_text, GenerationUnavailableError
 from response_schemas import lesson_sections_schema
 from lesson_store import checkpoint_plan, draft_digest
+from lesson_dependencies import status as dependency_status
 
 bp = Blueprint('builder', __name__, url_prefix='/builder')
 MODULES = {
@@ -372,10 +373,11 @@ def page(error=None, status=200, values=None, selected=None):
             'name': session.get('library_plan_name') or stored['config']['topic'],
             'saved': bool(session.get('library_plan_id')) and session.get('library_saved_digest') == draft_digest(stored),
         }
+    handout_status = dependency_status(stored, stored.get('handout')) if stored and stored.get('handout') else None
     return render_template('builder.html', presets=PRESETS, modules=MODULES, delivery=DELIVERY,
         activity_modules=ACTIVITY_MODULES, token=csrf(), draft=draft, library=library,
         notices=checks(stored) if stored else [], timing=timing_summary(stored) if stored else None,
-        error=error, values=values or {}, selected=selected), status
+        handout_status=handout_status, error=error, values=values or {}, selected=selected), status
 
 
 @bp.route('/', methods=['GET','POST'])

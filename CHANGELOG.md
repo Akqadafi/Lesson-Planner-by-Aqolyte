@@ -35,6 +35,12 @@ All notable changes to LPAPP are recorded here. The project uses
 - Added up to 20 recovery snapshots per lesson, including an automatic snapshot of unsaved edits
   immediately before full-plan or section-level AI generation; restoring a snapshot opens it as an
   unsaved draft and leaves the current saved copy intact
+- Added source-specific handout dependency tracking. Changes to a handout's source section or
+  the topic, grade, objectives, or source excerpts now identify the handout for review and pause
+  export; unrelated lesson sections no longer create a false stale warning.
+- Surface the affected-handout warning in both the Lesson Planner and Student Materials screens.
+  If the source section is removed, the teacher must create a replacement handout rather than
+  acknowledging alignment against a missing source.
 
 ### Planned
 

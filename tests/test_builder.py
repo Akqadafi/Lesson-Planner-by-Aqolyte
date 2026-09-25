@@ -11,6 +11,7 @@ import builder
 from openai_service import GenerationUnavailableError
 from bs4 import BeautifulSoup
 from docx import Document
+from lesson_dependencies import snapshot as dependency_snapshot
 
 def activity_record(session=1, minutes=20, transition=2, objective='Compare fractions.'):
     return {'session':session,'minutes':minutes,'transition_minutes':transition,
@@ -181,6 +182,18 @@ class BuilderTests(unittest.TestCase):
         self.assertTrue(all('items' not in row for row in rows))
         self.assertIn(b'Question-to-answer links are not machine-checked after manual edits',
                       self.client.get('/builder/').data)
+
+    def test_source_change_surfaces_a_related_handout_warning(self):
+        self.create(mode='scratch',sections=['overview'])
+        with self.client.session_transaction() as session:
+            draft=session['builder_draft']
+            draft['sections'][0]['content']='Original explanation of equivalent fractions.'
+            draft['handout']={'source':'overview','dependencies':dependency_snapshot(draft,'overview')}
+            draft['sections'][0]['content']='Updated explanation of equivalent fractions.'
+            session['builder_draft']=draft
+        page=self.client.get('/builder/')
+        self.assertIn(b'Student handout needs attention',page.data)
+        self.assertIn(b'source lesson section changed',page.data)
 
     def test_reorder_remove_add_edit_export(self):
         self.create(mode='scratch',sections=['worksheet','answers'])

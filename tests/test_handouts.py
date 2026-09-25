@@ -48,9 +48,37 @@ class HandoutTests(unittest.TestCase):
         self.create();self.save()
         with self.client.session_transaction() as s:
             d=s['builder_draft'];d['sections'][0]['content']='Changed lesson';s['builder_draft']=d
+        handout_page=self.client.get('/handouts/')
+        self.assertIn(b'The source lesson section changed.',handout_page.data)
         self.assertEqual(self.post('student').status_code,400)
         self.assertEqual(self.post('confirm').status_code,302)
         self.assertEqual(self.post('student').status_code,200)
+
+    def test_unrelated_lesson_edit_does_not_pause_handout_export(self):
+        self.create();self.save()
+        with self.client.session_transaction() as s:
+            d=s['builder_draft']
+            d['sections'].append({'id':'assessment','content':'Check understanding with an exit ticket.'})
+            d['config']['sections']=['activities','assessment']
+            d['revision']='changed-unrelated'
+            s['builder_draft']=d
+        page=self.client.get('/handouts/')
+        self.assertNotIn(b'Handout review required',page.data)
+        self.assertEqual(self.post('student').status_code,200)
+
+    def test_removed_handout_source_requires_replacement(self):
+        self.create();self.save()
+        with self.client.session_transaction() as s:
+            d=s['builder_draft']
+            d['sections']=[{'id':'assessment','content':'Check understanding with an exit ticket.'}]
+            d['config']['sections']=['assessment']
+            d['revision']='removed-source'
+            s['builder_draft']=d
+        page=self.client.get('/handouts/')
+        self.assertIn(b'Its source lesson section was removed.',page.data)
+        self.assertNotIn(b'I reviewed alignment with the updated lesson',page.data)
+        self.assertEqual(self.post('student').status_code,400)
+        self.assertEqual(self.post('confirm').status_code,400)
     @patch('handouts.generate_text')
     def test_generation_atomicity_and_grade_context(self,mock):
         self.create();self.save();old=self.state()['builder_draft']

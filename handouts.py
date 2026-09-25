@@ -13,6 +13,7 @@ from docx.oxml.ns import qn
 from builder import csrf, MODULES, number
 from openai_service import generate_text, GenerationUnavailableError
 from response_schemas import handout_schema
+from lesson_dependencies import snapshot as dependency_snapshot, status as dependency_status
 
 bp=Blueprint('handouts',__name__,url_prefix='/handouts')
 TYPES = {
@@ -114,7 +115,8 @@ def index():
                 count=number(request.form,'count',1,5 if kind=='exit' else 20)
                 h={'title':draft['config']['topic']+' — '+TYPES[kind]['name'],'instructions':TYPES[kind]['instructions'],
                    'kind':kind,'theme':'print','accent':'teal',
-                   'source':source,'source_hash':fingerprint(draft),'font':12,'space':3,'paper':'Letter',
+                   'source':source,'source_hash':fingerprint(draft),'dependencies':dependency_snapshot(draft,source),
+                   'font':12,'space':3,'paper':'Letter',
                    'questions':[{'id':i+1,'prompt':'','answer':''} for i in range(count)]}
             elif not h:raise ValueError('Create a worksheet first.')
             elif action=='generate':
@@ -136,7 +138,7 @@ Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}],
                     schema_name='lesson_handout')
                 try: generated=validate(json.loads(raw),len(h['questions']))
                 except (ValueError,TypeError,KeyError):raise ValueError('Generated exercises were incomplete or malformed. The saved handout is unchanged.') from None
-                h.update(generated);h['source_hash']=fingerprint(draft)
+                h.update(generated);h['source_hash']=fingerprint(draft);h['dependencies']=dependency_snapshot(draft,h['source'])
             elif action=='save':
                 pending=request.form
                 content=validate({'title':request.form.get('title'),'instructions':request.form.get('instructions'),
@@ -150,7 +152,9 @@ Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}],
                 h.update(content,font=font,space=space,paper=paper,theme=theme,accent=accent)
             elif action in ('student','teacher','student_pdf','teacher_pdf'):
                 validate(h,len(h['questions']))
-                if h['source_hash']!=fingerprint(draft):raise ValueError('The lesson changed. Regenerate the worksheet or review and confirm its alignment before exporting.')
+                handout_status=dependency_status(draft,h,fingerprint)
+                if handout_status['stale']:
+                    raise ValueError('This handout needs review before exporting: '+' '.join(handout_status['reasons']))
                 if action.endswith('_pdf'):
                     return send_file(convert_docx(document(h,action=='teacher_pdf')),as_attachment=True,
                         download_name=('Teacher ' if action=='teacher_pdf' else 'Student ')+TYPES[h.get('kind','practice')]['name']+'.pdf',mimetype='application/pdf')
@@ -158,7 +162,11 @@ Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}],
                     download_name=(('Teacher ' if action=='teacher' else 'Student ')+TYPES[h.get('kind','practice')]['name']+'.docx'),
                     mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
             elif action=='confirm':
-                validate(h,len(h['questions']));h['source_hash']=fingerprint(draft)
+                validate(h,len(h['questions']))
+                handout_status=dependency_status(draft,h,fingerprint)
+                if not handout_status['can_confirm']:
+                    raise ValueError('The source lesson section was removed. Create a new handout from an available section.')
+                h['source_hash']=fingerprint(draft);h['dependencies']=dependency_snapshot(draft,h['source'])
             else:raise ValueError('Choose a supported action.')
             draft['handout']=h;draft['revision']=secrets.token_hex(12);session['builder_draft']=draft
             return redirect(url_for('handouts.index'))
@@ -169,5 +177,6 @@ Plain text only, no HTML.'''},{'role':'user','content':json.dumps(payload)}],
     h=draft.get('handout')
     # Render only saved state after failures, retaining submitted edit values separately.
     draft=session.get('builder_draft');h=draft.get('handout')
+    handout_status=dependency_status(draft,h,fingerprint) if h else None
     return render_template('handouts.html',draft=draft,h=h,token=csrf(),modules=MODULES,error=error,
-        pending=pending or {},types=TYPES,themes=THEMES,accents=ACCENTS,stale=h and h['source_hash']!=fingerprint(draft)),status
+        pending=pending or {},types=TYPES,themes=THEMES,accents=ACCENTS,handout_status=handout_status),status

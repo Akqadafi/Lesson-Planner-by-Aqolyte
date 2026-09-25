@@ -117,8 +117,10 @@ The print-friendly design supports 10–18 pt text, 1–8 writing lines and Lett
 Answers are stored separately and omitted from the student export; teachers must still
 check that prompts themselves do not reveal answers. All content remains unverified.
 
-A lesson content/configuration change flags the handout and pauses export until the teacher
-regenerates it or acknowledges reviewing its alignment. One worksheet is stored within
+A change to the handout's source lesson section, topic, grade, objectives, or source excerpts
+flags the handout and pauses export until the teacher regenerates it or acknowledges reviewing
+its alignment. Unrelated lesson sections do not create a false warning. If the source section is
+removed, create a replacement handout before export. One worksheet is stored within
 the current session draft; starting a new lesson replaces it. Handouts are not yet stored as
 independent library records, and image uploads remain pending. Automatic PDF downloads require a configured converter (see below).
 No additional graphics packages are required for this initial text-based workflow.
