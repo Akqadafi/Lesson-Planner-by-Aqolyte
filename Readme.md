@@ -71,7 +71,7 @@ Project-Based Learning are additional presets. Classroom, station-based and blen
 learning are delivery options across approaches.
 
 1. Choose a path, approach, sections, grade, session duration and classroom context.
-2. Create an outline. This makes no AI request. Write sections yourself or generate them.
+2. Choose **Generate first lesson draft** to draft the selected sections with AI, or **Start with a blank outline** to write them yourself without an AI request.
 3. Save edits before rearranging, adding/removing or regenerating sections.
 4. Review factual claims, standards, activities, exercise answers and timing.
 5. Mark the draft teacher-reviewed and download Word. Any change clears that status.

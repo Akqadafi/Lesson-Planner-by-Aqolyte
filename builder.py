@@ -374,10 +374,12 @@ def page(error=None, status=200, values=None, selected=None):
             'saved': bool(session.get('library_plan_id')) and session.get('library_saved_digest') == draft_digest(stored),
         }
     handout_status = dependency_status(stored, stored.get('handout')) if stored and stored.get('handout') else None
+    needs_initial_generation = bool(stored and any(not row.get('content', '').strip() for row in stored['sections']))
     return render_template('builder.html', presets=PRESETS, modules=MODULES, delivery=DELIVERY,
         activity_modules=ACTIVITY_MODULES, token=csrf(), draft=draft, library=library,
         notices=checks(stored) if stored else [], timing=timing_summary(stored) if stored else None,
-        handout_status=handout_status, error=error, values=values or {}, selected=selected), status
+        handout_status=handout_status, needs_initial_generation=needs_initial_generation,
+        error=error, values=values or {}, selected=selected), status
 
 
 @bp.route('/', methods=['GET','POST'])
@@ -388,10 +390,12 @@ def index():
         return page('This form expired. Reload the page and try again.',400)
     action = request.form.get('operation') or request.form.get('action')
     try:
-        if action == 'create':
+        if action in ('create', 'create_generate'):
             config = configuration(request.form, request.form.getlist('sections'))
-            session['builder_draft'] = {'config':config, 'sections':[new_row(i) for i in config['sections']],
-                                        'revision':secrets.token_hex(12), 'reviewed':False}
+            draft = {'config':config, 'sections':[new_row(i) for i in config['sections']],
+                     'revision':secrets.token_hex(12), 'reviewed':False}
+            if action == 'create_generate':
+                draft['sections'] = draft_sections(config, [row['id'] for row in draft['sections']])
             for key in ('library_plan_id', 'library_plan_name', 'library_saved_digest'):
                 session.pop(key, None)
         else:
@@ -475,11 +479,11 @@ def index():
                     mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
             else:
                 raise ValueError('Choose a supported action.')
-            if action not in ('review','export','export_pdf'):
-                draft['reviewed']=False
-            draft['config']['sections']=[r['id'] for r in draft['sections']]
-            draft['revision']=secrets.token_hex(12)
-            session['builder_draft']=draft
+        if action not in ('review','export','export_pdf'):
+            draft['reviewed']=False
+        draft['config']['sections']=[r['id'] for r in draft['sections']]
+        draft['revision']=secrets.token_hex(12)
+        session['builder_draft']=draft
         return redirect(url_for('builder.index'))
     except PDFExportError as exc:
         return page(str(exc),503)

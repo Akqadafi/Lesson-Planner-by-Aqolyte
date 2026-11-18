@@ -7,6 +7,10 @@ All notable changes to LPAPP are recorded here. The project uses
 
 ### Changed
 
+- Added first-draft AI generation directly from lesson setup, alongside a blank-outline option.
+- Organized editing, section revision, and teacher review/export into explicit workflow steps.
+- Preserve the active draft when initial AI generation fails validation.
+
 - Reframed the experimental homepage around Aqolyte LLC as the parent company for web,
   educational, and applied AI tools, with Lesson Planner presented as its first product
 - Rebuilt About, Products, and Contact with the corporate design system and simplified the

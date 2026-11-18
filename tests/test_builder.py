@@ -61,6 +61,34 @@ class BuilderTests(unittest.TestCase):
             with self.client.get(asset.get('src') or asset['href']) as response:
                 self.assertEqual(response.status_code,200)
         self.assertEqual(len(soup.select('#setup [name=mode]')),3)
+        self.assertIn(b'Generate first lesson draft',page.data)
+        self.assertIn(b'Generate complete lesson draft',page.data)
+        self.assertIn(b'STEP 4 \xe2\x80\x94 REVIEW AND EXPORT',page.data)
+        self.assertLess(page.data.index(b'Save all edits'),page.data.index(b'Download Word draft'))
+
+    @patch('builder.generate_text')
+    def test_initial_ai_generation_creates_an_editable_draft(self,mock):
+        mock.return_value=json.dumps({'sections':[{'id':'objectives','content':'Students will compare fractions with visual models.'}]})
+        response=self.post('create_generate',mode='scratch',preset='prompt1',sections=['objectives'],
+                           topic='Fractions',grade='5',students='25',minutes='45',sessions='1',delivery='classroom')
+        self.assertEqual(response.status_code,302)
+        draft=self.state()['builder_draft']
+        self.assertEqual(draft['sections'][0]['content'],'Students will compare fractions with visual models.')
+        self.assertFalse(draft['reviewed'])
+        page=self.client.get('/builder/')
+        self.assertIn(b'Edit your lesson draft',page.data)
+        self.assertIn(b'Mark as teacher-reviewed',page.data)
+        mock.assert_called_once()
+
+    @patch('builder.generate_text')
+    def test_initial_generation_failure_preserves_current_draft(self,mock):
+        self.create(mode='scratch',sections=['title'])
+        old=self.state()['builder_draft']
+        mock.return_value='not valid JSON'
+        response=self.post('create_generate',mode='scratch',preset='prompt1',sections=['objectives'],
+                           topic='New fractions',grade='5',students='25',minutes='45',sessions='1',delivery='classroom')
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(self.state()['builder_draft'],old)
     def test_invalid_context_rejected_without_losing_draft(self):
         self.create()
         old=self.state()['builder_draft']
