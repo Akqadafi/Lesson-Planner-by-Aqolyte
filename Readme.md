@@ -1,6 +1,6 @@
-# LPAPP
+# Lesson Planner
 
-LPAPP is a Flask application that uses OpenAI to generate classroom lesson plans and worksheets. Teachers choose a lesson format, enter class context, and can download the generated material as a Word document.
+Lesson Planner is a Flask application that uses OpenAI to generate classroom lesson plans and worksheets. Teachers choose a lesson format, enter class context, and can download the generated material as a Word document.
 
 ## Features
 
